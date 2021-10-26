@@ -132,33 +132,9 @@
                         lacus suspendisse faucibus interdum posuere.</p>
                 </div>
             </div>
-            <h2>Multiple samples</h2>
-            <div class="row">
-                <div class="col-8">
-                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-                        labore et dolore magna aliqua. Tincidunt augue interdum velit euismod in pellentesque. Ut
-                        placerat orci nulla pellentesque dignissim enim. Sed felis eget velit aliquet sagittis. Pharetra
-                        et ultrices neque ornare aenean euismod elementum nisi quis. Enim sed faucibus turpis in eu.
-                        Massa tincidunt nunc pulvinar sapien. Egestas purus viverra accumsan in nisl nisi scelerisque
-                        eu. Arcu felis bibendum ut tristique et egestas quis ipsum. Sodales ut eu sem integer vitae
-                        justo eget magna. Arcu cursus euismod quis viverra nibh. Nisl pretium fusce id velit. Consequat
-                        id porta nibh venenatis.</p>
-                </div>
-            </div>
         </div>
 
         <div id="summary-plot-wrapper" hidden>
-            <!-- interval density -->
-            <div class="row" id="density">
-                <div class="col-12">
-                    <h3>Interval density</h3>
-                </div>
-            </div>
-            <div class="row pt-1">
-                <div class="col-12">
-                    <div id="interval-density-plot"></div>
-                </div>
-            </div>
         </div>
     </div>
 </main>
@@ -287,19 +263,33 @@
             let chromosomes = []
             if ($('#file-upload').prop('files')[0]) {
                 Papa.parse($('#file-upload').prop('files')[0], {
+                    delimiter: "\t",
                     skipEmptyLines: true,
                     header: false,
                     step: (results, parser) => {
+                        // check number of toks testing the delimiter
                         // likely going to need lengths in the future
                         let chr = results.data[0];
-                        // if (!(chr.startsWith('chr'))) {
-                        //     need to write a new local file in addition to updating chr right now...
-                        // }
-                        if (!(chr in interval_length)) {
-                            // set the chromosome order by appearance in bed file
-                            chromosomes.push(chr);
+                        // skip unhelpful chromosomes
+                        if (chr.match(/fix|random|alt|Un|hap/g) === null) {
+                            // console.log("results", results)
+                            if (results.data.length < 3) {
+                                // invalid format or separator
+                                // raise format error
+                                results.data = []
+                            }
+                            // if (!(chr.startsWith('chr'))) {
+                            //     need to write a new local file in addition to updating chr right now...
+                            // }
+                            if (!(chr in interval_length)) {
+                                // set the chromosome order by appearance in bed file
+                                chromosomes.push(chr);
+                            }
+                            interval_length[chr] = (interval_length[chr] || 0) + (results.data[2] - results.data[1]);
                         }
-                        interval_length[chr] = (interval_length[chr] || 0) + (results.data[2] - results.data[1]);
+                        else {
+                            results.data = []
+                        }
                     },
                     complete: (results, file) => {
 
@@ -314,11 +304,12 @@
                         $(".user-upload").prop("hidden", false);
                         $(".howto").prop("hidden", true);
 
+                        add_plot_div('interval-density', 'Interval density')
                         build_bar_plot(
                             chromosomes,
                             chromosomes.map(x => interval_length[x] / chromosome_lengths[x]),
                             "Chromosome",
-                            "Interval density",
+                            "Density",
                             "interval-density-plot"
                         );
 
