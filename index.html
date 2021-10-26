@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="author" content="Joe Brown" />
+    <title>bedqc</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces&display=swap" rel="stylesheet" />
+    <!-- CSS only -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+
+    <!-- JavaScript Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj"
+        crossorigin="anonymous"></script>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+        integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script src="https://cdn.plot.ly/plotly-2.2.0.min.js"></script>
+    <script src="https://cdn.biowasm.com/v2/aioli/latest/aioli.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.1/papaparse.min.js"></script>
+
+    <style>
+        body {
+            height: 100vh;
+            margin: 0px;
+            padding: 0px;
+        }
+
+        .brand {
+            font-family: "Fraunces", serif;
+            font-size: 2.2rem;
+            letter-spacing: -0.05em;
+            color: #d91e30 !important;
+        }
+
+        .text-sm {
+            font-size: 0.8rem;
+        }
+
+        .list-group-item.active {
+            background-color: white !important;
+            /* border-color: rgba(0,0,0,.125) rgba(0,0,0,.125) rgba(0,0,0,.125) #d91e30; !important; */
+            color: black !important;
+            border-top: 1px solid rgba(0, 0, 0, .125);
+            border-bottom: 1px solid rgba(0, 0, 0, .125);
+            border-right: 4px solid #d91e30 !important;
+        }
+
+        a.list-group-item.active>div>strong {
+            font-weight: 700 !important;
+        }
+
+        a.list-group-item>div>strong {
+            font-weight: 200;
+        }
+
+        .list-group-flush>.list-group-item {
+            border-right: 4px solid white;
+        }
+
+        .form-control-lg {
+            font-size: 1rem;
+        }
+    </style>
+</head>
+
+<main class="d-flex flex-row">
+
+    <div class="sticky-top h-100">
+
+        <nav class="d-flex flex-column flex-shrink-0 p-2 bg-light vh-100" style="width: 300px;" id="nav-pane">
+            <a class="navbar-brand brand d-flex align-items-center mb-md-0 me-md-auto text-decoration-none"
+                href="https://github.com/arq5x/bedtools2">bedtools qc</a>
+            <hr>
+
+            <h4>BED upload</h4>
+            <div class="mb-0 user-upload">
+                <!-- <input type="file" class="filepond" name="filepond" multiple data-max-file-size="3MB" id="file-upload"> -->
+                <input class="form-control form-control-lg pb-1" type="file" data-max-file-size="3MB" id="file-upload">
+                <div class="form-text">Supports drag and drop.</div>
+            </div>
+            <hr>
+            <div class="p-2">
+                <label for="genome-select" class="form-label">Genome</label>
+                <select class="form-select form-select-sm" id="genome-select">
+                    <option selected>hg38</option>
+                    <option>hg19</option>
+                </select>
+            </div>
+            <div class="p-2">
+                <label for="track-select" class="form-label">Intersection</label>
+                <select class="form-select form-select-sm" id="track-select">
+                    <option selected>None</option>
+                    <option value="gap">gaps</option>
+                    <!-- <option>centromeres</option> -->
+                </select>
+            </div>
+        </nav>
+    </div>
+
+    <div class="d-flex flex-column flex-fill p-3 pe-5" id="results-pane">
+
+        <div class="howto">
+            <h2>Uploading BED file</h2>
+            <div class="row">
+                <div class="col-8">
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
+                        labore et dolore magna aliqua. Tincidunt augue interdum velit euismod in pellentesque. Ut
+                        placerat orci nulla pellentesque dignissim enim. Sed felis eget velit aliquet sagittis. Pharetra
+                        et ultrices neque ornare aenean euismod elementum nisi quis. Enim sed faucibus turpis in eu.
+                        Massa tincidunt nunc pulvinar sapien. Egestas purus viverra accumsan in nisl nisi scelerisque
+                        eu. Arcu felis bibendum ut tristique et egestas quis ipsum. Sodales ut eu sem integer vitae
+                        justo eget magna. Arcu cursus euismod quis viverra nibh. Nisl pretium fusce id velit. Consequat
+                        id porta nibh venenatis.</p>
+                </div>
+            </div>
+            <h2>Interpreting plots</h2>
+            <h4>Interval density</h4>
+            <div class="row">
+                <div class="col-8">
+                    <p>Augue lacus viverra vitae congue eu. Bibendum ut tristique et egestas quis ipsum. Etiam non quam
+                        lacus suspendisse faucibus interdum posuere.</p>
+                </div>
+            </div>
+            <h4>Another plot type</h4>
+            <div class="row">
+                <div class="col-8">
+                    <p>Augue lacus viverra vitae congue eu. Bibendum ut tristique et egestas quis ipsum. Etiam non quam
+                        lacus suspendisse faucibus interdum posuere.</p>
+                </div>
+            </div>
+            <h2>Multiple samples</h2>
+            <div class="row">
+                <div class="col-8">
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
+                        labore et dolore magna aliqua. Tincidunt augue interdum velit euismod in pellentesque. Ut
+                        placerat orci nulla pellentesque dignissim enim. Sed felis eget velit aliquet sagittis. Pharetra
+                        et ultrices neque ornare aenean euismod elementum nisi quis. Enim sed faucibus turpis in eu.
+                        Massa tincidunt nunc pulvinar sapien. Egestas purus viverra accumsan in nisl nisi scelerisque
+                        eu. Arcu felis bibendum ut tristique et egestas quis ipsum. Sodales ut eu sem integer vitae
+                        justo eget magna. Arcu cursus euismod quis viverra nibh. Nisl pretium fusce id velit. Consequat
+                        id porta nibh venenatis.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="summary-plot-wrapper" hidden>
+            <!-- interval density -->
+            <div class="row" id="density">
+                <div class="col-12">
+                    <h3>Interval density</h3>
+                </div>
+            </div>
+            <div class="row pt-1">
+                <div class="col-12">
+                    <div id="interval-density-plot"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script type="module">
+
+    const qc_data = [];
+    const plot_y = 450;
+    const plot_config = {
+        displaylogo: false,
+        toImageButtonOptions: {
+            format: 'svg', // one of png, svg, jpeg, webp
+            filename: 'bedqc',
+            height: 600,
+            width: 1200,
+            scale: 1 // Multiply title/legend/axis/canvas sizes by this factor
+        },
+        responsive: true,
+    }
+
+    const add_plot_div = (track, title) => {
+        let d = document.getElementById("summary-plot-wrapper")
+
+        let exists = document.getElementById(`${track}-row`);
+        if (!(exists)) {
+            d.insertAdjacentHTML(
+                'beforeend',
+                `<div class="row" id="${track}-row">
+                    <div class="col-12">
+                        <h3>${title}</h3>
+                    </div>
+                </div>
+                <div class="row pt-1">
+                    <div class="col-12">
+                        <div id="${track}-plot"></div>
+                    </div>
+                </div>`
+            )
+        }
+    }
+
+    let CLI = await new Aioli("bedtools/2.29.2");
+    const output = await CLI.exec("bedtools --version");
+    console.log(`Loaded ${output}`);
+
+    const strip_prefix = (str) => {
+        if (str.startsWith("chr")) {
+            return str.slice(3)
+        }
+        return str
+    }
+
+    // arr.sort(function (a, b) {
+    //     let _a = strip_prefix(a)
+    //     let _b = strip_prefix(b)
+    //     console.log(_a, _b)
+    //     return _a - _b || _a > _b
+    // });
+
+    let chromosome_lengths = {};
+
+    const to_title = (str) => {
+        return str.replace(
+            /\w\S*/g,
+            (txt) => {
+                return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
+            }
+        )
+    }
+
+    const cli = async (file, genome, track, chromosomes, file_str) => {
+        // await CLI.ls(".")
+        await CLI.fs.writeFile("b.bed", file_str);
+        // sort UCSC query
+        let o = await CLI.exec("bedtools sort -i b.bed")
+        // overwrite track with sorted track
+        await CLI.fs.writeFile("b.bed", o);
+        // mount user upload
+        await CLI.mount($('#file-upload').prop('files')[0])
+        // intersect user upload and UCSC track
+        o = await CLI.exec(`bedtools intersect -a ${file.name} -b b.bed`)
+
+        // rows
+        o = o.split("\n").map(p => p.split("\t"))
+
+        let chr_count = {}
+        o.forEach(row => {
+            chr_count[row[0]] = (chr_count[row[0]] || 0) + 1;
+        })
+
+        // append a div...
+        add_plot_div(track, `${to_title(track)} intersect count`)
+        build_bar_plot(
+            chromosomes,
+            chromosomes.map(chr => chr_count[chr]),
+            "Chromosome",
+            "Overlap count",
+            `${track}-plot`
+        )
+    }
+
+    const bedtools_intersect = async (file, genome, track, chromosomes) => {
+        let ucsc_str = ""
+        jQuery.getJSON(`https://api.genome.ucsc.edu/getData/track?genome=${genome};track=${track}`, (track_data) => {
+            let selection = track_data[track]
+            chromosomes.forEach(chr => {
+                // chromosomes come from user file; check exists in API track
+                if (chr in selection) {
+                    selection[chr].forEach(idx => {
+                        ucsc_str += `${idx.chrom}\t${idx.chromStart}\t${idx.chromEnd}\n`
+                    })
+                }
+            });
+        }).then(() => {
+            cli(file, genome, track, chromosomes, ucsc_str)
+        })
+    }
+
+    const onChange = (event) => {
+        let genome = $('#genome-select').val()
+        let chromosome_lengths;
+        jQuery.getJSON(`https://api.genome.ucsc.edu/list/chromosomes?genome=${genome}`, (d) => {
+            chromosome_lengths = d.chromosomes
+        }).then(() => {
+            let interval_length = {}
+            let chromosomes = []
+            if ($('#file-upload').prop('files')[0]) {
+                Papa.parse($('#file-upload').prop('files')[0], {
+                    skipEmptyLines: true,
+                    header: false,
+                    step: (results, parser) => {
+                        // likely going to need lengths in the future
+                        let chr = results.data[0];
+                        // if (!(chr.startsWith('chr'))) {
+                        //     need to write a new local file in addition to updating chr right now...
+                        // }
+                        if (!(chr in interval_length)) {
+                            // set the chromosome order by appearance in bed file
+                            chromosomes.push(chr);
+                        }
+                        interval_length[chr] = (interval_length[chr] || 0) + (results.data[2] - results.data[1]);
+                    },
+                    complete: (results, file) => {
+
+                        // chromosomes.sort((a, b) => {
+                        //     let _a = strip_prefix(a)
+                        //     let _b = strip_prefix(b)
+                        //     return _a - _b || _a > _b
+                        // })
+
+                        $("#file-upload-primary-wrapper").prop("hidden", true);
+                        $("#summary-plot-wrapper").prop("hidden", false);
+                        $(".user-upload").prop("hidden", false);
+                        $(".howto").prop("hidden", true);
+
+                        build_bar_plot(
+                            chromosomes,
+                            chromosomes.map(x => interval_length[x] / chromosome_lengths[x]),
+                            "Chromosome",
+                            "Interval density",
+                            "interval-density-plot"
+                        );
+
+                        // update metadata. need to know if chr prefix was added
+                        // would like to know total number of entries
+
+                        // + 0 length intervals is indicative of bad format
+                        // + total base pairs per file
+                        // + total intervals, dist of sizes, etc
+                        // + chr prefix detected and added
+                        // + field separator detected
+
+                        let track = $('#track-select').val()
+                        if (!(track == 'None')) {
+                            bedtools_intersect(file, genome, track, chromosomes)
+                            // update metadata for this intersection. how many records were downloaded and total overlaps with these regions
+                        }
+                    }
+                })
+            }
+        })
+    }
+
+    // const mean = (data) => {
+    //     let result = 0;
+    //     let n = 0;
+    //     for (let i = 0; i < data.length; i++) {
+    //         let d = data[i];
+    //         if (d >= 0) {
+    //             n += 1;
+    //             result += d;
+    //         }
+    //     }
+    //     return result / n;
+    // };
+
+    const aesthetics = {
+        tickfont: {
+            family: "Courier New, monospace",
+            size: 16,
+            color: "#000",
+        },
+        labelfont: {
+            family: "Raleway, sans-serif",
+            size: 12,
+        }
+    }
+
+    const build_bar_plot = (chrs, o, x_title, y_title, div) => {
+        let traces = [
+            {
+                x: chrs,
+                y: o,
+                type: "bar",
+                marker: {
+                    color: "#4e79a7",
+                },
+                name: "Observed"
+            }
+        ];
+        // console.log(traces)
+
+        let layout = {
+            height: plot_y,
+            font: aesthetics.labelfont,
+            padding: {
+                t: 0,
+                r: 0,
+            },
+            margin: {
+                t: 0,
+                r: 0,
+            },
+            xaxis: {
+                title: x_title,
+                automargin: true,
+                type: "category",
+            },
+            yaxis: {
+                title: y_title,
+                automargin: true,
+            },
+            legend: {
+                font: {
+                    size: 16
+                }
+            }
+        };
+
+        return Plotly.newPlot(div, traces, layout, plot_config);
+    };
+
+    $(document).ready(function () {
+        document.getElementById("file-upload").addEventListener('change', onChange);
+        document.getElementById("genome-select").addEventListener('change', onChange);
+        document.getElementById("track-select").addEventListener('change', onChange);
+    });
+</script>
+
+</html>
