@@ -8,13 +8,10 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Fraunces&display=swap" rel="stylesheet" />
     <!-- CSS only -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- JavaScript Bundle with Popper -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj"
-        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"
         integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
@@ -71,33 +68,39 @@
 
     <div class="sticky-top h-100">
 
-        <nav class="d-flex flex-column flex-shrink-0 p-2 bg-light vh-100" style="width: 300px;" id="nav-pane">
+        <nav class="d-flex flex-column flex-shrink-0 p-2 vh-100" style="width: 300px;" id="nav-pane">
             <a class="navbar-brand brand d-flex align-items-center mb-md-0 me-md-auto text-decoration-none"
-                href="https://github.com/arq5x/bedtools2">bedtools qc</a>
-            <hr>
+                href="https://github.com/quinlan-lab/bedqc">.bed qc</a>
 
-            <h4>BED upload</h4>
-            <div class="mb-0 user-upload">
-                <!-- <input type="file" class="filepond" name="filepond" multiple data-max-file-size="3MB" id="file-upload"> -->
-                <input class="form-control form-control-lg pb-1" type="file" data-max-file-size="3MB" id="file-upload">
-                <div class="form-text">Supports drag and drop.</div>
+            <div class="bg-light py-3 px-2 border">
+                <div class="user-upload">
+                    <label for="file-upload" class="form-label">Upload</label>
+                    <input class="form-control form-control-lg" type="file" id="file-upload">
+                </div>
+                <div class="pt-2">
+                    <label for="genome-select" class="form-label">Genome</label>
+                    <select class="form-select form-select-sm" id="genome-select">
+                        <option selected>hg38</option>
+                        <option>hg19</option>
+                    </select>
+                </div>
             </div>
-            <hr>
+
             <div class="p-2">
-                <label for="genome-select" class="form-label">Genome</label>
-                <select class="form-select form-select-sm" id="genome-select">
-                    <option selected>hg38</option>
-                    <option>hg19</option>
-                </select>
-            </div>
-            <div class="p-2">
-                <label for="track-select" class="form-label">Intersection</label>
+                <label for="track-select" class="form-label">Intersect</label>
                 <select class="form-select form-select-sm" id="track-select">
                     <option selected>None</option>
                     <option value="gap">gaps</option>
-                    <!-- <option>centromeres</option> -->
                 </select>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" value="gaps" id="intersect-gap">
+                    <label class="form-check-label" for="intersect-gap">
+                        gaps
+                    </label>
+                </div>
             </div>
+            <button type="button" class="btn btn-secondary">Apply</button>
+
         </nav>
     </div>
 
@@ -135,6 +138,35 @@
         </div>
 
         <div id="summary-plot-wrapper" hidden>
+            <div class="row" id="metrics-row">
+                <div class="col-12">
+                    <h3>Summary: <span id="summary-filename"></span></h3>
+                </div>
+            </div>
+            <div class="row pt-1">
+                <div class="col-6">
+                    <table class="table table-borderless table-small">
+                        <tbody id="metadata-table">
+                            <tr>
+                                <td>Interval count</td>
+                                <td id="summary-interval-count"></td>
+                            </tr>
+                            <tr>
+                                <td>Nucleotides</td>
+                                <td id="summary-nucleotides"></td>
+                            </tr>
+                            <tr>
+                                <td>Filtered intervals</td>
+                                <td id="summary-filtered-intervals"></td>
+                            </tr>
+                            <tr>
+                                <td>Zero length intervals</td>
+                                <td id="summary-zero-length-intervals"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 </main>
@@ -142,7 +174,7 @@
 <script type="module">
 
     const qc_data = [];
-    const plot_y = 450;
+    const plot_y = 375;
     const plot_config = {
         displaylogo: false,
         toImageButtonOptions: {
@@ -174,6 +206,7 @@
                 </div>`
             )
         }
+        return Promise.resolve()
     }
 
     let CLI = await new Aioli("bedtools/2.29.2");
@@ -195,6 +228,7 @@
     // });
 
     let chromosome_lengths = {};
+    let prefix = true
 
     const to_title = (str) => {
         return str.replace(
@@ -236,7 +270,7 @@
         )
     }
 
-    const bedtools_intersect = async (file, genome, track, chromosomes) => {
+    const bedtools_intersect = async (file, genome, track, chromosomes, prefix) => {
         let ucsc_str = ""
         jQuery.getJSON(`https://api.genome.ucsc.edu/getData/track?genome=${genome};track=${track}`, (track_data) => {
             let selection = track_data[track]
@@ -244,7 +278,12 @@
                 // chromosomes come from user file; check exists in API track
                 if (chr in selection) {
                     selection[chr].forEach(idx => {
-                        ucsc_str += `${idx.chrom}\t${idx.chromStart}\t${idx.chromEnd}\n`
+                        if (!(prefix)) {
+                            // strip chr prefix from UCSC result
+                            ucsc_str += `${idx.chrom.substring(3)}\t${idx.chromStart}\t${idx.chromEnd}\n`
+                        } else {
+                            ucsc_str += `${idx.chrom}\t${idx.chromStart}\t${idx.chromEnd}\n`
+                        }
                     })
                 }
             });
@@ -258,74 +297,133 @@
         let chromosome_lengths;
         jQuery.getJSON(`https://api.genome.ucsc.edu/list/chromosomes?genome=${genome}`, (d) => {
             chromosome_lengths = d.chromosomes
+            // adds non-chr prefixed chroms in addition to chr prefixed result
+            Object.keys(chromosome_lengths).map(k => chromosome_lengths[k.substring(3)] = chromosome_lengths[k])
         }).then(() => {
             let interval_length = {}
-            let chromosomes = []
+            let m = {
+                'interval_count': 0,
+                'interval_length_total': 0,
+                'interval_lengths': [],
+                'filtered_intervals': 0,
+                'zero_length_intervals': 0,
+                'extends_beyond_chr': 0,
+                'chr_prefix': true,
+                'chromosomes': []
+            };
             if ($('#file-upload').prop('files')[0]) {
                 Papa.parse($('#file-upload').prop('files')[0], {
                     delimiter: "\t",
                     skipEmptyLines: true,
                     header: false,
                     step: (results, parser) => {
+                        m.interval_count += 1;
                         // check number of toks testing the delimiter
                         // likely going to need lengths in the future
                         let chr = results.data[0];
                         // skip unhelpful chromosomes
                         if (chr.match(/fix|random|alt|Un|hap/g) === null) {
-                            // console.log("results", results)
                             if (results.data.length < 3) {
                                 // invalid format or separator
                                 // raise format error
                                 results.data = []
+                                console.log("invalid format (chrom, start, stop) or separator ('\\t')")
+                                return
                             }
-                            // if (!(chr.startsWith('chr'))) {
-                            //     need to write a new local file in addition to updating chr right now...
-                            // }
+
+                            // check for 'chr' prefix
+                            if (!(chr.startsWith('chr'))) {
+                                m.prefix = false
+                            }
+
+                            // set the chromosome order by appearance in bed file
                             if (!(chr in interval_length)) {
-                                // set the chromosome order by appearance in bed file
-                                chromosomes.push(chr);
+                                m.chromosomes.push(chr);
                             }
-                            interval_length[chr] = (interval_length[chr] || 0) + (results.data[2] - results.data[1]);
+
+                            // malformatted entry; 0-based start, 1-based end
+                            let current_length = results.data[2] - results.data[1]
+                            if (current_length == 0) {
+                                m.zero_length_intervals += 1
+                            }
+
+                            m.interval_length_total += current_length
+
+                            // check if end extends beyond chrom end
+                            // this could also be a plot
+
+                            m.interval_lengths.push(current_length)
+                            interval_length[chr] = (interval_length[chr] || 0) + (current_length);
                         }
                         else {
+                            m.filtered_intervals += 1
+                            console.log(chr)
                             results.data = []
                         }
                     },
                     complete: (results, file) => {
-
-                        // chromosomes.sort((a, b) => {
-                        //     let _a = strip_prefix(a)
-                        //     let _b = strip_prefix(b)
-                        //     return _a - _b || _a > _b
-                        // })
-
                         $("#file-upload-primary-wrapper").prop("hidden", true);
                         $("#summary-plot-wrapper").prop("hidden", false);
                         $(".user-upload").prop("hidden", false);
                         $(".howto").prop("hidden", true);
 
+                        $("#summary-filename").html(file.name)
+                        $("#summary-interval-count").html(m.interval_count.toLocaleString())
+                        $("#summary-nucleotides").html(m.interval_length_total.toLocaleString())
+                        $("#summary-filtered-intervals").html(m.filtered_intervals.toLocaleString())
+                        $("#summary-zero-length-intervals").html(m.zero_length_intervals.toLocaleString())
+
                         add_plot_div('interval-density', 'Interval density')
                         build_bar_plot(
-                            chromosomes,
-                            chromosomes.map(x => interval_length[x] / chromosome_lengths[x]),
+                            m.chromosomes,
+                            m.chromosomes.map(x => interval_length[x] / chromosome_lengths[x]),
                             "Chromosome",
                             "Density",
                             "interval-density-plot"
                         );
+                        add_plot_div('interval-size-dist', 'Interval size distribution').then(() => {
+                            var trace = {
+                                x: m.interval_lengths,
+                                type: 'histogram',
+                                marker: {
+                                    color: aesthetics.palette[0],
+                                },
+                            };
+                            let layout = {
+                                height: plot_y,
+                                font: aesthetics.labelfont,
+                                padding: {
+                                    t: 0,
+                                    r: 0,
+                                },
+                                margin: {
+                                    t: 0,
+                                    r: 0,
+                                },
+                                xaxis: {
+                                    title: "Interval length",
+                                    automargin: true,
+                                },
+                                yaxis: {
+                                    title: "Count",
+                                    automargin: true,
+                                },
+                                legend: {
+                                    font: {
+                                        size: 16
+                                    }
+                                }
+                            };
+                            Plotly.newPlot('interval-size-dist-plot', [trace], layout, plot_config)
+                        })
 
-                        // update metadata. need to know if chr prefix was added
-                        // would like to know total number of entries
-
-                        // + 0 length intervals is indicative of bad format
-                        // + total base pairs per file
-                        // + total intervals, dist of sizes, etc
-                        // + chr prefix detected and added
-                        // + field separator detected
-
+                        // inspect checkboxes
                         let track = $('#track-select').val()
                         if (!(track == 'None')) {
-                            bedtools_intersect(file, genome, track, chromosomes)
-                            // update metadata for this intersection. how many records were downloaded and total overlaps with these regions
+                            if (!(prefix)) {
+                            } else {
+                                bedtools_intersect(file, genome, track, m.chromosomes, m.prefix)
+                            }
                         }
                     }
                 })
@@ -347,6 +445,7 @@
     // };
 
     const aesthetics = {
+        palette: ["#4e79a7", "#f28e2c", "#e15759", "#76b7b2", "#59a14f", "#edc949", "#af7aa1", "#ff9da7", "#9c755f", "#bab0ab"],
         tickfont: {
             family: "Courier New, monospace",
             size: 16,
@@ -365,7 +464,11 @@
                 y: o,
                 type: "bar",
                 marker: {
-                    color: "#4e79a7",
+                    color: aesthetics.palette[0],
+                    line: {
+                        color: 'black',
+                        width: 1
+                    },
                 },
                 name: "Observed"
             }
