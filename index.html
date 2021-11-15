@@ -88,18 +88,17 @@
 
             <div class="p-2">
                 <label for="track-select" class="form-label">Intersect</label>
-                <select class="form-select form-select-sm" id="track-select">
+                <!-- <select class="form-select form-select-sm" id="track-select">
                     <option selected>None</option>
                     <option value="gap">gaps</option>
-                </select>
+                </select> -->
                 <div class="form-check">
-                    <input class="form-check-input" type="checkbox" value="gaps" id="intersect-gap">
+                    <input class="form-check-input" type="checkbox" id="intersect-gap">
                     <label class="form-check-label" for="intersect-gap">
                         gaps
                     </label>
                 </div>
             </div>
-            <button type="button" class="btn btn-secondary">Apply</button>
 
         </nav>
     </div>
@@ -152,16 +151,8 @@
                                 <td id="summary-interval-count"></td>
                             </tr>
                             <tr>
-                                <td>Nucleotides</td>
-                                <td id="summary-nucleotides"></td>
-                            </tr>
-                            <tr>
-                                <td>Filtered intervals</td>
-                                <td id="summary-filtered-intervals"></td>
-                            </tr>
-                            <tr>
-                                <td>Zero length intervals</td>
-                                <td id="summary-zero-length-intervals"></td>
+                                <td>Total base pairs</td>
+                                <td id="summary-total-bp"></td>
                             </tr>
                         </tbody>
                     </table>
@@ -207,6 +198,23 @@
             )
         }
         return Promise.resolve()
+    }
+
+    const add_table_row = ({ title, value }) => {
+        let divid = title.replace(" ", "-")
+        let d = document.getElementById("metadata-table")
+        let exists = document.getElementById(divid)
+        if (!(exists)) {
+            d.insertAdjacentHTML(
+                "beforeend",
+                `<tr>
+                    <td>${title}</td>
+                    <td id="${divid}">${value}</td>
+                </tr>`
+            )
+        } else {
+            $(`#${divid}`).html(value)
+        }
     }
 
     let CLI = await new Aioli("bedtools/2.29.2");
@@ -280,6 +288,7 @@
                     selection[chr].forEach(idx => {
                         if (!(prefix)) {
                             // strip chr prefix from UCSC result
+                            console.log("stripping chr prefix from UCSC results")
                             ucsc_str += `${idx.chrom.substring(3)}\t${idx.chromStart}\t${idx.chromEnd}\n`
                         } else {
                             ucsc_str += `${idx.chrom}\t${idx.chromStart}\t${idx.chromEnd}\n`
@@ -292,7 +301,29 @@
         })
     }
 
+    const checkbox_change = (event) => {
+        let file = $('#file-upload').prop('files')[0]
+        let genome = $('#genome-select').val()
+        if ($("#intersect-gap").prop("checked") == true) {
+            bedtools_intersect(file, genome, "gap", m.chromosomes, m.chr_prefix)
+        }
+        // additional checkboxes
+    }
+
+    let m = {
+        'interval_count': 0,
+        'interval_length_total': 0,
+        'interval_lengths': [],
+        'filtered_intervals': 0,
+        'zero_length_intervals': 0,
+        'extends_beyond_chr': 0,
+        'chr_prefix': true,
+        'chromosomes': []
+    }
+
     const onChange = (event) => {
+        document.getElementById("intersect-gap").addEventListener('change', checkbox_change);
+
         let genome = $('#genome-select').val()
         let chromosome_lengths;
         jQuery.getJSON(`https://api.genome.ucsc.edu/list/chromosomes?genome=${genome}`, (d) => {
@@ -301,7 +332,8 @@
             Object.keys(chromosome_lengths).map(k => chromosome_lengths[k.substring(3)] = chromosome_lengths[k])
         }).then(() => {
             let interval_length = {}
-            let m = {
+            // new upload
+            m = {
                 'interval_count': 0,
                 'interval_length_total': 0,
                 'interval_lengths': [],
@@ -310,7 +342,7 @@
                 'extends_beyond_chr': 0,
                 'chr_prefix': true,
                 'chromosomes': []
-            };
+            }
             if ($('#file-upload').prop('files')[0]) {
                 Papa.parse($('#file-upload').prop('files')[0], {
                     delimiter: "\t",
@@ -333,7 +365,8 @@
 
                             // check for 'chr' prefix
                             if (!(chr.startsWith('chr'))) {
-                                m.prefix = false
+                                m.chr_prefix = false
+                                // will need to check if some have chr and some do not
                             }
 
                             // set the chromosome order by appearance in bed file
@@ -357,8 +390,6 @@
                         }
                         else {
                             m.filtered_intervals += 1
-                            console.log(chr)
-                            results.data = []
                         }
                     },
                     complete: (results, file) => {
@@ -369,9 +400,19 @@
 
                         $("#summary-filename").html(file.name)
                         $("#summary-interval-count").html(m.interval_count.toLocaleString())
-                        $("#summary-nucleotides").html(m.interval_length_total.toLocaleString())
-                        $("#summary-filtered-intervals").html(m.filtered_intervals.toLocaleString())
-                        $("#summary-zero-length-intervals").html(m.zero_length_intervals.toLocaleString())
+                        $("#summary-total-bp").html(m.interval_length_total.toLocaleString())
+                        if (m.filtered_intervals > 0) {
+                            add_table_row({
+                                title: "Filtered intervals",
+                                value: m.filtered_intervals.toLocaleString()
+                            })
+                        }
+                        if (m.zero_length_intervals > 0) {
+                            add_table_row({
+                                title: "0-length intervals",
+                                value: m.zero_length_intervals.toLocaleString()
+                            })
+                        }
 
                         add_plot_div('interval-density', 'Interval density')
                         build_bar_plot(
@@ -418,13 +459,7 @@
                         })
 
                         // inspect checkboxes
-                        let track = $('#track-select').val()
-                        if (!(track == 'None')) {
-                            if (!(prefix)) {
-                            } else {
-                                bedtools_intersect(file, genome, track, m.chromosomes, m.prefix)
-                            }
-                        }
+                        checkbox_change(null)
                     }
                 })
             }
@@ -508,7 +543,6 @@
     $(document).ready(function () {
         document.getElementById("file-upload").addEventListener('change', onChange);
         document.getElementById("genome-select").addEventListener('change', onChange);
-        document.getElementById("track-select").addEventListener('change', onChange);
     });
 </script>
 
