@@ -87,11 +87,7 @@
             </div>
 
             <div class="p-2">
-                <label for="track-select" class="form-label">Intersect</label>
-                <!-- <select class="form-select form-select-sm" id="track-select">
-                    <option selected>None</option>
-                    <option value="gap">gaps</option>
-                </select> -->
+                <label class="form-label">Intersect</label>
                 <div class="form-check">
                     <input class="form-check-input" type="checkbox" id="intersect-gap">
                     <label class="form-check-label" for="intersect-gap">
@@ -190,7 +186,7 @@
                         <h3>${title}</h3>
                     </div>
                 </div>
-                <div class="row pt-1">
+                <div class="row pt-1" id="${track}-plot-row">
                     <div class="col-12">
                         <div id="${track}-plot"></div>
                     </div>
@@ -302,10 +298,25 @@
     }
 
     const checkbox_change = (event) => {
-        let file = $('#file-upload').prop('files')[0]
-        let genome = $('#genome-select').val()
+        if (event.target.checked == false) {
+            // remove the div of the unchecked intersection
+            // intersect-gap and need to remove gap-row, gap-plot-row
+            let pfx = event.target.id.split("-")[1]
+            document.getElementById(`${pfx}-row`).remove()
+            document.getElementById(`${pfx}-plot-row`).remove()
+        } else {
+            let file = $('#file-upload').prop('files')[0]
+            let genome = $('#genome-select').val()
+            if ($("#intersect-gap").prop("checked") == true) {
+                bedtools_intersect(file, genome, "gap", m.chromosomes, m.chr_prefix)
+            }
+            // additional checkboxes
+        }
+    }
+
+    const handle_checkboxes = ({file, genome, chroms, chr_prefix}) => {
         if ($("#intersect-gap").prop("checked") == true) {
-            bedtools_intersect(file, genome, "gap", m.chromosomes, m.chr_prefix)
+            bedtools_intersect(file, genome, "gap", chroms, chr_prefix)
         }
         // additional checkboxes
     }
@@ -458,8 +469,13 @@
                             Plotly.newPlot('interval-size-dist-plot', [trace], layout, plot_config)
                         })
 
-                        // inspect checkboxes
-                        checkbox_change(null)
+                        // handle checkboxes
+                        handle_checkboxes({
+                            file: file,
+                            genome: genome,
+                            chroms: m.chromosomes,
+                            chr_prefix: m.chr_prefix
+                        })
                     }
                 })
             }
