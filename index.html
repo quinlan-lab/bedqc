@@ -33,31 +33,6 @@
             color: #d91e30 !important;
         }
 
-        .text-sm {
-            font-size: 0.8rem;
-        }
-
-        .list-group-item.active {
-            background-color: white !important;
-            /* border-color: rgba(0,0,0,.125) rgba(0,0,0,.125) rgba(0,0,0,.125) #d91e30; !important; */
-            color: black !important;
-            border-top: 1px solid rgba(0, 0, 0, .125);
-            border-bottom: 1px solid rgba(0, 0, 0, .125);
-            border-right: 4px solid #d91e30 !important;
-        }
-
-        a.list-group-item.active>div>strong {
-            font-weight: 700 !important;
-        }
-
-        a.list-group-item>div>strong {
-            font-weight: 200;
-        }
-
-        .list-group-flush>.list-group-item {
-            border-right: 4px solid white;
-        }
-
         .form-control-lg {
             font-size: 1rem;
         }
@@ -73,16 +48,16 @@
                 href="https://github.com/quinlan-lab/bedqc">.bed qc</a>
 
             <div class="bg-light py-3 px-2 border">
-                <div class="user-upload">
-                    <label for="file-upload" class="form-label">Upload</label>
-                    <input class="form-control form-control-lg" type="file" id="file-upload">
-                </div>
-                <div class="pt-2">
+                <div class="">
                     <label for="genome-select" class="form-label">Genome</label>
                     <select class="form-select form-select-sm" id="genome-select">
                         <option selected>hg38</option>
                         <option>hg19</option>
                     </select>
+                </div>
+                <div class="user-upload pt-3">
+                    <!-- <label for="file-upload" class="form-label">Upload</label> -->
+                    <input class="form-control form-control-lg" type="file" id="file-upload">
                 </div>
             </div>
 
@@ -102,20 +77,20 @@
     <div class="d-flex flex-column flex-fill p-3 pe-5" id="results-pane">
 
         <div class="howto">
-            <h2>Uploading BED file</h2>
+            <h2>Selecting a BED file</h2>
             <div class="row">
                 <div class="col-8">
-                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-                        labore et dolore magna aliqua. Tincidunt augue interdum velit euismod in pellentesque. Ut
-                        placerat orci nulla pellentesque dignissim enim. Sed felis eget velit aliquet sagittis. Pharetra
-                        et ultrices neque ornare aenean euismod elementum nisi quis. Enim sed faucibus turpis in eu.
-                        Massa tincidunt nunc pulvinar sapien. Egestas purus viverra accumsan in nisl nisi scelerisque
-                        eu. Arcu felis bibendum ut tristique et egestas quis ipsum. Sodales ut eu sem integer vitae
-                        justo eget magna. Arcu cursus euismod quis viverra nibh. Nisl pretium fusce id velit. Consequat
-                        id porta nibh venenatis.</p>
+                    1. Select the likely genome build of the BED file being processed.
+                    2. Click <code>Browse...</code> or drag-and-drop a file into the <code>Browse...</code>
+                    input area.
+                    3. Select additional options to help determine quality of your intervals
                 </div>
             </div>
             <h2>Interpreting plots</h2>
+            metrics that are collected
+            interval density
+            expected value
+            interval size distribution
             <h4>Interval density</h4>
             <div class="row">
                 <div class="col-8">
@@ -343,9 +318,11 @@
             Object.keys(chromosome_lengths).map(k => chromosome_lengths[k.substring(3)] = chromosome_lengths[k])
         }).then(() => {
             let interval_length = {}
+            let interval_count = {}
             // new upload
             m = {
                 'interval_count': 0,
+                'interval_count_filtered': 0,
                 'interval_length_total': 0,
                 'interval_lengths': [],
                 'filtered_intervals': 0,
@@ -366,6 +343,7 @@
                         let chr = results.data[0];
                         // skip unhelpful chromosomes
                         if (chr.match(/fix|random|alt|Un|hap/g) === null) {
+                            m.interval_count_filtered += 1;
                             if (results.data.length < 3) {
                                 // invalid format or separator
                                 // raise format error
@@ -397,7 +375,8 @@
                             // this could also be a plot
 
                             m.interval_lengths.push(current_length)
-                            interval_length[chr] = (interval_length[chr] || 0) + (current_length);
+                            interval_length[chr] = (interval_length[chr] || 0) + current_length;
+                            interval_count[chr] = (interval_count[chr] || 0) + 1;
                         }
                         else {
                             m.filtered_intervals += 1
@@ -426,12 +405,29 @@
                         }
 
                         add_plot_div('interval-density', 'Interval density')
+                        // length corrected for only displayed chromosomes
+                        let genome_length = 0
+                        m.chromosomes.map(x => genome_length += chromosome_lengths[x])
+
                         build_bar_plot(
                             m.chromosomes,
-                            m.chromosomes.map(x => interval_length[x] / chromosome_lengths[x]),
+                            m.chromosomes.map(x => interval_count[x] / m.interval_count_filtered),
                             "Chromosome",
                             "Density",
-                            "interval-density-plot"
+                            "interval-density-plot",
+                            {
+                                x: m.chromosomes,
+                                y: m.chromosomes.map(x => (chromosome_lengths[x] / genome_length)),
+                                type: "scatter",
+                                name: "Expected",
+                                mode: "markers",
+                                marker: {
+                                    size: 12, symbol: "circle", color: "#f28e2c", line: {
+                                        color: 'rgb(255,255,255)',
+                                        width: 1
+                                    },
+                                }
+                            }
                         );
                         add_plot_div('interval-size-dist', 'Interval size distribution').then(() => {
                             var trace = {
@@ -508,7 +504,7 @@
         }
     }
 
-    const build_bar_plot = (chrs, o, x_title, y_title, div) => {
+    const build_bar_plot = (chrs, o, x_title, y_title, div, trace=false) => {
         let traces = [
             {
                 x: chrs,
@@ -524,6 +520,10 @@
                 name: "Observed"
             }
         ];
+
+        if (trace) {
+            traces.push(trace)
+        }
         // console.log(traces)
 
         let layout = {
