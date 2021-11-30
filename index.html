@@ -85,8 +85,8 @@
     <div class="d-flex flex-column flex-fill p-3 pe-5" id="results-pane">
 
         <div class="howto">
-            <h2>Using bed qc</h2>
-            <div class="row pb-3">
+            <h2 class="pb-2">Using bed qc</h2>
+            <div class="row pb-4">
                 <div class="col-4">
                     <div class="card info-card">
                         <div class="card-body">
@@ -117,56 +117,47 @@
                     </div>
                 </div>
             </div>
-            <h2>Interpreting plots</h2>
-            <div class="row pb-3">
+            <h2 class="pb-2">Interpreting plots</h2>
+            <h4>Interval density</h4>
+            <div class="row pb-4">
                 <div class="col-6">
-                    <div class="card plot-card">
-                        <div class="card-body">
-                            <h5 class="card-title">Interval density</h5>
-                            <h6 class="card-subtitle mb-2 text-success">Normal</h6>
-                            <div class="card-img-top" id="interval-density-normal"></div>
-                            <p class="card-text pt-2">Based on the known chromosome length and total interval count, the
-                                intervals are spread evenly among the chromosomes.
-                            </p>
-                        </div>
+                    <div class="card-body">
+                        <h6 class="card-subtitle mb-2 text-success">Normal</h6>
+                        <div class="card-img-top" id="interval-density-normal"></div>
+                        <p class="card-text pt-2">Based on the known chromosome length and total interval count, the
+                            intervals are spread evenly among the chromosomes.
+                        </p>
                     </div>
                 </div>
                 <div class="col-6">
-                    <div class="card plot-card">
-                        <div class="card-body">
-                            <h5 class="card-title">Interval density</h5>
-                            <h6 class="card-subtitle mb-2 text-warning">Potential issue</h6>
-                            <div class="card-img-top" id="interval-density-issue"></div>
-                            <p class="card-text">Unequal distribution among chromosomes could mean
-                                a filter has been applied unevenly or possible file truncation.
-                            </p>
-                        </div>
+                    <div class="card-body">
+                        <h6 class="card-subtitle mb-2 text-warning">Potential issue</h6>
+                        <div class="card-img-top" id="interval-density-issue"></div>
+                        <p class="card-text">Unequal distribution among chromosomes could mean
+                            a filter has been applied unevenly or possible file truncation.
+                        </p>
                     </div>
                 </div>
             </div>
+            <h4>Gap intersect</h4>
             <div class="row pb-3">
                 <div class="col-6">
-                    <div class="card plot-card">
-                        <div class="card-body">
-                            <h5 class="card-title">Gap intersect</h5>
-                            <h6 class="card-subtitle mb-2 text-success">Normal</h6>
-                            <div class="card-img-top" id="gap-intersect-normal"></div>
-                            <p class="card-text pt-2">Our intervals (in this case) do not overlap the centromeres
-                                suggesting the selected genome build is <span class="fw-bold fst-italic">not incorrect</span>.
-                            </p>
-                        </div>
+                    <div class="card-body">
+                        <h6 class="card-subtitle mb-2 text-success">Normal</h6>
+                        <div class="card-img-top" id="gap-intersect-normal"></div>
+                        <p class="card-text pt-2">Our intervals (in this case) do not overlap the centromeres
+                            suggesting the selected genome build is <span class="fw-bold fst-italic">not
+                                incorrect</span>.
+                        </p>
                     </div>
                 </div>
                 <div class="col-6">
-                    <div class="card plot-card">
-                        <div class="card-body">
-                            <h5 class="card-title">Gap intersect</h5>
-                            <h6 class="card-subtitle mb-2 text-warning">Potential issue</h6>
-                            <div class="card-img-top" id="gap-intersect-issue"></div>
-                            <p class="card-text">In most cases, when we overlap our meaningful regions
-                                with known gaps we anticipate no centromere overlap.
-                            </p>
-                        </div>
+                    <div class="card-body">
+                        <h6 class="card-subtitle mb-2 text-warning">Potential issue</h6>
+                        <div class="card-img-top" id="gap-intersect-issue"></div>
+                        <p class="card-text">In most cases, when we overlap our meaningful regions
+                            with known gaps we anticipate no centromere overlap.
+                        </p>
                     </div>
                 </div>
             </div>
