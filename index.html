@@ -36,6 +36,14 @@
         .form-control-lg {
             font-size: 1rem;
         }
+
+        .info-card {
+            min-height: 165px;
+        }
+
+        .plot-card {
+            min-height: 362px;
+        }
     </style>
 </head>
 
@@ -77,32 +85,63 @@
     <div class="d-flex flex-column flex-fill p-3 pe-5" id="results-pane">
 
         <div class="howto">
-            <h2>Selecting a BED file</h2>
-            <div class="row">
-                <div class="col-8">
-                    1. Select the likely genome build of the BED file being processed.
-                    2. Click <code>Browse...</code> or drag-and-drop a file into the <code>Browse...</code>
-                    input area.
-                    3. Select additional options to help determine quality of your intervals
+            <h2>Using bed qc</h2>
+            <div class="row pb-3">
+                <div class="col-4">
+                    <div class="card info-card">
+                        <div class="card-body">
+                            <h5 class="card-title">Select genome</h5>
+                            <p class="card-text">Choose the likely genome build of your BED file. This option can be
+                                changed throughout the analysis.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="card info-card">
+                        <div class="card-body">
+                            <h5 class="card-title">Select file</h5>
+                            <p class="card-text">Click <code>Browse...</code> or drag-and-drop your BED file to load.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <div class="card info-card">
+                        <div class="card-body">
+                            <h5 class="card-title">Select intersection(s)</h5>
+                            <p class="card-text">Choose additional overlap options to determine quality and genome build
+                                of your intervals.
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </div>
             <h2>Interpreting plots</h2>
-            metrics that are collected
-            interval density
-            expected value
-            interval size distribution
-            <h4>Interval density</h4>
-            <div class="row">
-                <div class="col-8">
-                    <p>Augue lacus viverra vitae congue eu. Bibendum ut tristique et egestas quis ipsum. Etiam non quam
-                        lacus suspendisse faucibus interdum posuere.</p>
+            <div class="row pb-3">
+                <div class="col-6">
+                    <div class="card plot-card">
+                        <div class="card-img-top" id="interval-density-normal"></div>
+                        <div class="card-body">
+                            <h5 class="card-title">Interval density</h5>
+                            <h6 class="card-subtitle mb-2 text-success">Normal</h6>
+                            <p class="card-text">Based on the known chromosome length and total interval count, the
+                                intervals are spread evenly among the chromosomes.
+                            </p>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <h4>Another plot type</h4>
-            <div class="row">
-                <div class="col-8">
-                    <p>Augue lacus viverra vitae congue eu. Bibendum ut tristique et egestas quis ipsum. Etiam non quam
-                        lacus suspendisse faucibus interdum posuere.</p>
+                <div class="col-6">
+                    <div class="card plot-card">
+                        <div class="card-img-top" id="interval-density-issue"></div>
+                        <div class="card-body">
+                            <h5 class="card-title">Interval density</h5>
+                            <h6 class="card-subtitle mb-2 text-warning">Potential issue</h6>
+                            <p class="card-text">Unequal distribution among chromosomes could mean
+                                a filter has been applied unevenly or possible file truncation.
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -148,6 +187,40 @@
         },
         responsive: true,
     }
+    const aesthetics = {
+        palette: ["#4e79a7", "#f28e2c", "#e15759", "#76b7b2", "#59a14f", "#edc949", "#af7aa1", "#ff9da7", "#9c755f", "#bab0ab"],
+        tickfont: {
+            family: "Courier New, monospace",
+            size: 16,
+            color: "#000",
+        },
+        labelfont: {
+            family: "Raleway, sans-serif",
+            size: 12,
+        }
+    }
+
+    const build_example_plot = ({x, o, e, divid, ytitle}) => {
+        let traces = [{ x: x, y: o, type: "bar", marker: { color: aesthetics.palette[0], line: { color: 'black', width: 1 }, }, name: "Observed" }, { x: x, y: e, type: "scatter", name: "Expected", mode: "markers", marker: { size: 12, symbol: "circle", color: "#f28e2c", line: { color: 'rgb(255,255,255)', width: 1 }, } }];
+        let layout = { height: 200, font: aesthetics.labelfont, padding: { t: 20, r: 0, b: 0 }, margin: { t: 20, r: 0, b: 0 }, xaxis: { automargin: true, type: "category", }, yaxis: { title: ytitle, automargin: true, }, legend: { font: { size: 12 } } };
+        Plotly.newPlot(divid, traces, layout, {staticPlot: true, responsive: true});
+    }
+
+    // build the example page during page load
+    build_example_plot({
+        x: ["chr1", "chr2", "chr3"],
+        o: [0.075, 0.079, 0.06],
+        e: [0.08, 0.07, 0.06],
+        divid: "interval-density-normal",
+        ytitle: "Density"
+    })
+    build_example_plot({
+        x: ["chr1", "chr2", "chr3"],
+        o: [0.075, 0.13, 0.025],
+        e: [0.08, 0.07, 0.06],
+        divid: "interval-density-issue",
+        ytitle: "Density"
+    })
 
     const add_plot_div = (track, title) => {
         let d = document.getElementById("summary-plot-wrapper")
@@ -289,7 +362,7 @@
         }
     }
 
-    const handle_checkboxes = ({file, genome, chroms, chr_prefix}) => {
+    const handle_checkboxes = ({ file, genome, chroms, chr_prefix }) => {
         if ($("#intersect-gap").prop("checked") == true) {
             bedtools_intersect(file, genome, "gap", chroms, chr_prefix)
         }
@@ -491,20 +564,7 @@
     //     return result / n;
     // };
 
-    const aesthetics = {
-        palette: ["#4e79a7", "#f28e2c", "#e15759", "#76b7b2", "#59a14f", "#edc949", "#af7aa1", "#ff9da7", "#9c755f", "#bab0ab"],
-        tickfont: {
-            family: "Courier New, monospace",
-            size: 16,
-            color: "#000",
-        },
-        labelfont: {
-            family: "Raleway, sans-serif",
-            size: 12,
-        }
-    }
-
-    const build_bar_plot = (chrs, o, x_title, y_title, div, trace=false) => {
+    const build_bar_plot = (chrs, o, x_title, y_title, div, trace = false) => {
         let traces = [
             {
                 x: chrs,
