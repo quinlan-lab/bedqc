@@ -44,6 +44,13 @@
         .plot-card {
             min-height: 362px;
         }
+
+        .tab-content>.tab-pane:not(.active),
+        .pill-content>.pill-pane:not(.active) {
+            display: block;
+            height: 0;
+            overflow-y: hidden;
+        }
     </style>
 </head>
 
@@ -82,107 +89,123 @@
         </nav>
     </div>
 
-    <div class="d-flex flex-column flex-fill p-3 pe-5" id="results-pane">
+    <div class="d-flex flex-column flex-fill p-3 pe-5">
 
-        <div class="howto">
-            <h2 class="pb-2">Using bed qc</h2>
-            <div class="row pb-4">
-                <div class="col-4">
-                    <!-- <div class="card info-card"> -->
+        <ul class="nav nav-tabs" id="main-tab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="help-tab" data-bs-toggle="tab" data-bs-target="#help-pane"
+                    type="button" role="tab">Help</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link disabled" id="results-tab" data-bs-toggle="tab" data-bs-target="#results-pane"
+                    type="button" role="tab">Results</button>
+            </li>
+        </ul>
+
+        <div class="tab-content pt-3">
+            <div class="tab-pane fade show active" id="help-pane" role="tabpanel">
+                <h2 class="pb-2">Using bed qc</h2>
+                <div class="row pb-4">
+                    <div class="col-4">
+                        <!-- <div class="card info-card"> -->
                         <div class="card-body">
                             <h5 class="card-title">1. Select genome</h5>
                             <p class="card-text">Choose the likely genome build of your BED file. This option can be
                                 changed throughout the analysis.
                             </p>
                         </div>
-                    <!-- </div> -->
-                </div>
-                <div class="col-4">
-                    <!-- <div class="card info-card"> -->
+                        <!-- </div> -->
+                    </div>
+                    <div class="col-4">
+                        <!-- <div class="card info-card"> -->
                         <div class="card-body">
                             <h5 class="card-title">2. Select file</h5>
                             <p class="card-text">Click <code>Browse...</code> or drag-and-drop your BED file to load.
                             </p>
                         </div>
-                    <!-- </div> -->
-                </div>
-                <div class="col-4">
-                    <!-- <div class="card info-card"> -->
+                        <!-- </div> -->
+                    </div>
+                    <div class="col-4">
+                        <!-- <div class="card info-card"> -->
                         <div class="card-body">
                             <h5 class="card-title">3. Select intersection(s)</h5>
                             <p class="card-text">Choose additional overlap options to determine quality and genome build
                                 of your intervals.
                             </p>
                         </div>
-                    <!-- </div> -->
+                        <!-- </div> -->
+                    </div>
+                </div>
+                <h2 class="pb-2">Interpreting plots</h2>
+                <h4>Interval density</h4>
+                <div class="row pb-4">
+                    <div class="col-6">
+                        <div class="card-body">
+                            <h6 class="card-subtitle mb-2 text-success">Normal</h6>
+                            <div class="card-img-top" id="interval-density-normal"></div>
+                            <p class="card-text pt-2">Based on the known chromosome length and total interval count, the
+                                intervals are spread evenly among the chromosomes.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="card-body">
+                            <h6 class="card-subtitle mb-2 text-warning">Potential issue</h6>
+                            <div class="card-img-top" id="interval-density-issue"></div>
+                            <p class="card-text">Unequal distribution among chromosomes could mean
+                                a filter has been applied unevenly or possible file truncation.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <h4>Gap intersect</h4>
+                <div class="row pb-3">
+                    <div class="col-6">
+                        <div class="card-body">
+                            <h6 class="card-subtitle mb-2 text-success">Normal</h6>
+                            <div class="card-img-top" id="gap-intersect-normal"></div>
+                            <p class="card-text pt-2">Our intervals (in this case) do not overlap the centromeres
+                                suggesting the selected genome build is <span class="fw-bold fst-italic">not
+                                    incorrect</span>.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="card-body">
+                            <h6 class="card-subtitle mb-2 text-warning">Potential issue</h6>
+                            <div class="card-img-top" id="gap-intersect-issue"></div>
+                            <p class="card-text">In most cases, when we overlap our meaningful regions
+                                with known gaps we anticipate no centromere overlap.
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <h2 class="pb-2">Interpreting plots</h2>
-            <h4>Interval density</h4>
-            <div class="row pb-4">
-                <div class="col-6">
-                    <div class="card-body">
-                        <h6 class="card-subtitle mb-2 text-success">Normal</h6>
-                        <div class="card-img-top" id="interval-density-normal"></div>
-                        <p class="card-text pt-2">Based on the known chromosome length and total interval count, the
-                            intervals are spread evenly among the chromosomes.
-                        </p>
-                    </div>
-                </div>
-                <div class="col-6">
-                    <div class="card-body">
-                        <h6 class="card-subtitle mb-2 text-warning">Potential issue</h6>
-                        <div class="card-img-top" id="interval-density-issue"></div>
-                        <p class="card-text">Unequal distribution among chromosomes could mean
-                            a filter has been applied unevenly or possible file truncation.
-                        </p>
-                    </div>
-                </div>
-            </div>
-            <h4>Gap intersect</h4>
-            <div class="row pb-3">
-                <div class="col-6">
-                    <div class="card-body">
-                        <h6 class="card-subtitle mb-2 text-success">Normal</h6>
-                        <div class="card-img-top" id="gap-intersect-normal"></div>
-                        <p class="card-text pt-2">Our intervals (in this case) do not overlap the centromeres
-                            suggesting the selected genome build is <span class="fw-bold fst-italic">not
-                                incorrect</span>.
-                        </p>
-                    </div>
-                </div>
-                <div class="col-6">
-                    <div class="card-body">
-                        <h6 class="card-subtitle mb-2 text-warning">Potential issue</h6>
-                        <div class="card-img-top" id="gap-intersect-issue"></div>
-                        <p class="card-text">In most cases, when we overlap our meaningful regions
-                            with known gaps we anticipate no centromere overlap.
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
 
-        <div id="summary-plot-wrapper" hidden>
-            <div class="row" id="metrics-row">
-                <div class="col-12">
-                    <h3>Summary: <span id="summary-filename"></span></h3>
-                </div>
-            </div>
-            <div class="row pt-1">
-                <div class="col-6">
-                    <table class="table table-borderless table-small">
-                        <tbody id="metadata-table">
-                            <tr>
-                                <td>Interval count</td>
-                                <td id="summary-interval-count"></td>
-                            </tr>
-                            <tr>
-                                <td>Total base pairs</td>
-                                <td id="summary-total-bp"></td>
-                            </tr>
-                        </tbody>
-                    </table>
+
+            <div class="tab-pane fade" id="results-pane" role="tabpanel">
+                <div id="summary-plot-wrapper">
+                    <div class="row" id="metrics-row">
+                        <div class="col-12">
+                            <h3>Summary: <span id="summary-filename"></span></h3>
+                        </div>
+                    </div>
+                    <div class="row pt-1">
+                        <div class="col-6">
+                            <table class="table table-borderless table-small">
+                                <tbody id="metadata-table">
+                                    <tr>
+                                        <td>Interval count</td>
+                                        <td id="summary-interval-count"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Total base pairs</td>
+                                        <td id="summary-total-bp"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -490,10 +513,18 @@
                         }
                     },
                     complete: (results, file) => {
-                        $("#file-upload-primary-wrapper").prop("hidden", true);
-                        $("#summary-plot-wrapper").prop("hidden", false);
-                        $(".user-upload").prop("hidden", false);
-                        $(".howto").prop("hidden", true);
+
+                        var element = document.getElementById("results-tab");
+                        element.classList.remove("disabled");
+
+                        var someTabTriggerEl = document.querySelector('#results-tab')
+                        var tab = new bootstrap.Tab(someTabTriggerEl)
+                        tab.show()
+
+                        // $("#file-upload-primary-wrapper").prop("hidden", true);
+                        // $("#summary-plot-wrapper").prop("hidden", false);
+                        // $(".user-upload").prop("hidden", false);
+                        // $(".howto").prop("hidden", true);
 
                         $("#summary-filename").html(file.name)
                         $("#summary-interval-count").html(m.interval_count.toLocaleString())
