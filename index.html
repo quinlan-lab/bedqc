@@ -54,198 +54,66 @@
             height: 0;
             overflow-y: hidden;
         }
+
+        table {
+            white-space: pre;
+            font-size: 1.2rem;
+        }
     </style>
 </head>
 
-<header class="sticky-top p-2">
-    <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
-        <a class="navbar-brand brand d-flex align-items-center mb-md-0 me-md-auto text-decoration-none"
-            href="https://github.com/quinlan-lab/bedqc">.bed qc</a>
-
-        <!-- <ul class="nav col-12 col-lg-auto my-2 justify-content-center my-md-0 text-small"> -->
-            <!-- <li> -->
-                <!-- <a href="#" class="nav-link text-secondary"> -->
-                <!-- </a> -->
-            <!-- </li> -->
-        <!-- </ul> -->
-    </div>
-    <div class="px-3 py-2 mb-3">
-        <div class="m-5">
-            <label for="file-upload-test" class="form-label w-100 m-0">
-                <div class="row">
-                    <div class="col-12">
-                        <h1>Upload .bed</h1>
-                    </div>
+<nav class="navbar">
+    <div class="container-fluid row">
+        <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+            <a class="navbar-brand brand d-flex align-items-center mb-md-0 me-md-auto text-decoration-none"
+                href="https://github.com/quinlan-lab/bedqc">.bed qc</a>
+        </div>
+        <div class="col-lg-8 mx-auto px-2">
+            <label for="file-upload" class="form-label w-100 m-0">
+                <div class="col-12 my-3">
+                    <h2>Upload .bed</h2>
                 </div>
             </label>
-            <input class="form-control form-control-lg" type="file" id="file-upload-test">
-            <label for="file-upload-test" class="form-label w-100">
+            <input class="form-control form-control-lg" type="file" id="file-upload">
+            <label for="file-upload" class="form-label w-100">
                 <div class="row">
-                    <div class="col-12">
+                    <div class="col-12 py-2 text-secondary">
                         Supports drag and drop. Your files are never sent to us.
                     </div>
                 </div>
             </label>
         </div>
     </div>
-</header>
+</nav>
 
-<main class="d-flex flex-row">
+<main class="container-fluid" id="content">
 
-    <div class="">
+    <!-- <label for="genome-select" class="form-label">Genome</label>
+    <select class="form-select form-select-sm" id="genome-select">
+        <option selected>hg38</option>
+        <option>hg19</option>
+    </select> -->
 
-        <nav class="d-flex flex-column flex-shrink-0 p-2" style="width: 300px;" id="nav-pane">
-            <a class="navbar-brand brand d-flex align-items-center mb-md-0 me-md-auto text-decoration-none"
-                href="https://github.com/quinlan-lab/bedqc">.bed qc</a>
-
-            <div class="bg-light py-3 px-2 border">
-                <div class="">
-                    <label for="genome-select" class="form-label">Genome</label>
-                    <select class="form-select form-select-sm" id="genome-select">
-                        <option selected>hg38</option>
-                        <option>hg19</option>
-                    </select>
-                </div>
-                <div class="user-upload pt-3">
-                    <!-- <label for="file-upload" class="form-label">Upload</label> -->
-                    <input class="form-control form-control-lg" type="file" id="file-upload">
-                </div>
-            </div>
-
-            <div class="p-2">
-                <label class="form-label">Intersect</label>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="intersect-gap">
-                    <label class="form-check-label" for="intersect-gap">
-                        gaps
-                    </label>
-                </div>
-            </div>
-
-        </nav>
-    </div>
-
-    <div class="d-flex flex-column flex-fill p-3 pe-5">
-
-        <ul class="nav nav-tabs" id="main-tab" role="tablist">
-            <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="help-tab" data-bs-toggle="tab" data-bs-target="#help-pane"
-                    type="button" role="tab">Help</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link disabled" id="results-tab" data-bs-toggle="tab" data-bs-target="#results-pane"
-                    type="button" role="tab">Results</button>
-            </li>
-        </ul>
-
-        <div class="tab-content pt-3">
-            <div class="tab-pane fade show active" id="help-pane" role="tabpanel">
-                <h2 class="pb-2">Using bed qc</h2>
-                <div class="row pb-4">
-                    <div class="col-4">
-                        <!-- <div class="card info-card"> -->
-                        <div class="card-body">
-                            <h5 class="card-title">1. Select genome</h5>
-                            <p class="card-text">Choose the likely genome build of your BED file. This option can be
-                                changed throughout the analysis.
-                            </p>
-                        </div>
-                        <!-- </div> -->
-                    </div>
-                    <div class="col-4">
-                        <!-- <div class="card info-card"> -->
-                        <div class="card-body">
-                            <h5 class="card-title">2. Select file</h5>
-                            <p class="card-text">Click <code>Browse...</code> or drag-and-drop your BED file to load.
-                            </p>
-                        </div>
-                        <!-- </div> -->
-                    </div>
-                    <div class="col-4">
-                        <!-- <div class="card info-card"> -->
-                        <div class="card-body">
-                            <h5 class="card-title">3. Select intersection(s)</h5>
-                            <p class="card-text">Choose additional overlap options to determine quality and genome build
-                                of your intervals.
-                            </p>
-                        </div>
-                        <!-- </div> -->
-                    </div>
-                </div>
-                <h2 class="pb-2">Interpreting plots</h2>
-                <h4>Interval density</h4>
-                <div class="row pb-4">
-                    <div class="col-6">
-                        <div class="card-body">
-                            <h6 class="card-subtitle mb-2 text-success">Normal</h6>
-                            <div class="card-img-top" id="interval-density-normal"></div>
-                            <p class="card-text pt-2">Based on the known chromosome length and total interval count, the
-                                intervals are spread evenly among the chromosomes.
-                            </p>
-                        </div>
-                    </div>
-                    <div class="col-6">
-                        <div class="card-body">
-                            <h6 class="card-subtitle mb-2 text-warning">Potential issue</h6>
-                            <div class="card-img-top" id="interval-density-issue"></div>
-                            <p class="card-text">Unequal distribution among chromosomes could mean
-                                a filter has been applied unevenly or possible file truncation.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-                <h4>Gap intersect</h4>
-                <div class="row pb-3">
-                    <div class="col-6">
-                        <div class="card-body">
-                            <h6 class="card-subtitle mb-2 text-success">Normal</h6>
-                            <div class="card-img-top" id="gap-intersect-normal"></div>
-                            <p class="card-text pt-2">Our intervals (in this case) do not overlap the centromeres
-                                suggesting the selected genome build is <span class="fw-bold fst-italic">not
-                                    incorrect</span>.
-                            </p>
-                        </div>
-                    </div>
-                    <div class="col-6">
-                        <div class="card-body">
-                            <h6 class="card-subtitle mb-2 text-warning">Potential issue</h6>
-                            <div class="card-img-top" id="gap-intersect-issue"></div>
-                            <p class="card-text">In most cases, when we overlap our meaningful regions
-                                with known gaps we anticipate no centromere overlap.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <!-- <label class="form-label">Intersect</label>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="intersect-gap">
+        <label class="form-check-label" for="intersect-gap">
+            gaps
+        </label>
+    </div> -->
 
 
-            <div class="tab-pane fade" id="results-pane" role="tabpanel">
-                <div id="summary-plot-wrapper">
-                    <div class="row" id="metrics-row">
-                        <div class="col-12">
-                            <h3>Summary: <span id="summary-filename"></span></h3>
-                        </div>
-                    </div>
-                    <div class="row pt-1">
-                        <div class="col-6">
-                            <table class="table table-borderless table-small">
-                                <tbody id="metadata-table">
-                                    <tr>
-                                        <td>Interval count</td>
-                                        <td id="summary-interval-count"></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Total base pairs</td>
-                                        <td id="summary-total-bp"></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    <!-- Choose the likely genome build of your BED file. This option can be changed or another build can be added. -->
+    <!-- Choose additional overlap options to determine quality and genome build of your intervals. -->
+
+    <!-- Interval density -->
+    <!-- Based on the known chromosome length and total interval count, the intervals are spread evenly among the chromosomes. -->
+    <!-- Unequal distribution among chromosomes could mean a filter has been applied unevenly or possible file truncation. -->
+
+    <!-- Gap intersect -->
+    <!-- Our intervals (in this case) do not overlap the centromeres suggesting the selected genome build is not incorrect. -->
+    <!-- In most cases, when we overlap our meaningful regions with known gaps we anticipate no centromere overlap. -->
+
 </main>
 
 <script type="module">
@@ -276,77 +144,83 @@
         }
     }
 
-    const build_example_plot = ({ x, o, e, divid, ytitle }) => {
-        let traces = [{ x: x, y: o, type: "bar", marker: { color: aesthetics.palette[0], line: { color: 'black', width: 1 }, }, name: "Observed" }];
-        if (e.length > 0) {
-            traces.push({ x: x, y: e, type: "scatter", name: "Expected", mode: "markers", marker: { size: 12, symbol: "circle", color: "#f28e2c", line: { color: 'rgb(255,255,255)', width: 1 }, } })
-        }
-        let layout = { height: 200, font: aesthetics.labelfont, padding: { t: 0, r: 0, b: 0 }, margin: { t: 0, r: 0, b: 0 }, xaxis: { automargin: true, type: "category", }, yaxis: { title: ytitle, automargin: true, }, legend: { font: { size: 12 } } };
-        Plotly.newPlot(divid, traces, layout, { staticPlot: true, responsive: true });
-    }
+    // const build_example_plot = ({ x, o, e, divid, ytitle }) => {
+    //     let traces = [{ x: x, y: o, type: "bar", marker: { color: aesthetics.palette[0], line: { color: 'black', width: 1 }, }, name: "Observed" }];
+    //     if (e.length > 0) {
+    //         traces.push({ x: x, y: e, type: "scatter", name: "Expected", mode: "markers", marker: { size: 12, symbol: "circle", color: "#f28e2c", line: { color: 'rgb(255,255,255)', width: 1 }, } })
+    //     }
+    //     let layout = { height: 200, font: aesthetics.labelfont, padding: { t: 0, r: 0, b: 0 }, margin: { t: 0, r: 0, b: 0 }, xaxis: { automargin: true, type: "category", }, yaxis: { title: ytitle, automargin: true, }, legend: { font: { size: 12 } } };
+    //     Plotly.newPlot(divid, traces, layout, { staticPlot: true, responsive: true });
+    // }
 
-    // build the example page during page load
-    build_example_plot({
-        x: ["chr1", "chr2", "chr3"],
-        o: [0.075, 0.079, 0.06],
-        e: [0.08, 0.07, 0.06],
-        divid: "interval-density-normal",
-        ytitle: "Density"
-    })
-    build_example_plot({
-        x: ["chr1", "chr2", "chr3"],
-        o: [0.075, 0.13, 0.025],
-        e: [0.08, 0.07, 0.06],
-        divid: "interval-density-issue",
-        ytitle: "Density"
-    })
-    build_example_plot({
-        x: ["chr1", "chr2", "chr3"],
-        o: [0, 0, 0],
-        e: [],
-        divid: "gap-intersect-normal",
-        ytitle: "Count"
-    })
-    build_example_plot({
-        x: ["chr1", "chr2", "chr3"],
-        o: [50, 57, 22],
-        e: [],
-        divid: "gap-intersect-issue",
-        ytitle: "Count"
-    })
+    // // build the example page during page load
+    // build_example_plot({
+    //     x: ["chr1", "chr2", "chr3"],
+    //     o: [0.075, 0.079, 0.06],
+    //     e: [0.08, 0.07, 0.06],
+    //     divid: "interval-density-normal",
+    //     ytitle: "Density"
+    // })
+    // build_example_plot({
+    //     x: ["chr1", "chr2", "chr3"],
+    //     o: [0.075, 0.13, 0.025],
+    //     e: [0.08, 0.07, 0.06],
+    //     divid: "interval-density-issue",
+    //     ytitle: "Density"
+    // })
+    // build_example_plot({
+    //     x: ["chr1", "chr2", "chr3"],
+    //     o: [0, 0, 0],
+    //     e: [],
+    //     divid: "gap-intersect-normal",
+    //     ytitle: "Count"
+    // })
+    // build_example_plot({
+    //     x: ["chr1", "chr2", "chr3"],
+    //     o: [50, 57, 22],
+    //     e: [],
+    //     divid: "gap-intersect-issue",
+    //     ytitle: "Count"
+    // })
 
-    const add_plot_div = (track, title) => {
-        let d = document.getElementById("summary-plot-wrapper")
+    const add_plot_div = (track, title, pb=2) => {
+        let d = document.getElementById("content")
 
         let exists = document.getElementById(`${track}-row`);
         if (!(exists)) {
             d.insertAdjacentHTML(
                 'beforeend',
-                `<div class="row" id="${track}-row">
-                    <div class="col-12">
-                        <h3>${title}</h3>
+                `<div class="container-fluid row pb-${pb}">
+                    <div class="col-lg-8 mx-auto p-0">
+                        <div class="row" id="${track}-row">
+                            <div class="col-12">
+                                <h5>${title}</h5>
+                            </div>
+                        </div>
+                        <div class="row pt-1" id="${track}-plot-row">
+                            <div class="col-12">
+                                <div id="${track}-plot"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="row pt-1" id="${track}-plot-row">
-                    <div class="col-12">
-                        <div id="${track}-plot"></div>
-                    </div>
-                </div>`
+                `
             )
         }
         return Promise.resolve()
     }
 
-    const add_table_row = ({ title, value }) => {
+    const add_table_row = ({ title, value, warn }) => {
         let divid = title.replace(" ", "-")
         let d = document.getElementById("metadata-table")
         let exists = document.getElementById(divid)
+        let text_color = warn ? "text-warn" : "text-primary"
         if (!(exists)) {
             d.insertAdjacentHTML(
                 "beforeend",
                 `<tr>
                     <td>${title}</td>
-                    <td id="${divid}">${value}</td>
+                    <td id="${divid}" class="${text_color}"><pre>${value}</pre></td>
                 </tr>`
             )
         } else {
@@ -462,16 +336,258 @@
         // additional checkboxes
     }
 
-    let m = {
-        interval_count: 0,
-        interval_length_total: 0,
-        interval_lengths: [],
-        filtered_intervals: 0,
-        zero_length_intervals: 0,
-        extends_beyond_chr: 0,
-        chr_prefix: true,
-        chromosomes: [],
-        all_chromosomes: []
+    const delimiter_string = (sep) => {
+        if (sep == "\t") {
+            return "\\t"
+        } else {
+            return sep
+        }
+    }
+
+    const newline_string = (nl) => {
+        if (nl == "\n") {
+            return "\\n"
+        } else if (nl == "\r\n") {
+            return "\\r\\n"
+        } else {
+            return `${nl}`
+        }
+    }
+
+    const genome_build = () => {
+        let d = document.getElementById("content")
+        d.insertAdjacentHTML(
+            "beforeend",
+            `<div class="container-fluid row pb-2">
+                <div class="col-lg-8 mx-auto p-0">
+                    <label for="genome-select" class="form-label w-100 m-0">
+                        <div class="col-12 my-3">
+                            <h2>Genome build</h2>
+                        </div>
+                    </label>
+                    <div class="row">
+                        <div class="col-3">
+                            <select class="form-select form-select-lg" id="species-select" disabled>
+                                <option selected>human</option>
+                            </select>
+                        </div>
+                        <div class="col-6">
+                            <select class="form-select form-select-lg" id="genome-select">
+                                <option selected>hg38</option>
+                                <option>hg19</option>
+                            </select>
+                        </div>
+                        <div class="col-3">
+                            <div class="d-grid gap-2">
+                                <button type="button" class="btn btn-primary btn-lg" id="genome-select-action">Apply</button>
+                            </div>
+                        </div>
+                    </div>
+                    <label for="genome-select" class="form-label w-100">
+                        <div class="row">
+                            <div class="col-12 py-2 text-secondary">
+                                Select the genome build of the BED file. This option can be changed later to test if other genome builds better fit these data.
+                            </div>
+                        </div>
+                    </label>
+                </div>
+            </div>
+            `
+        )
+        // window.scrollTo(0, document.body.scrollHeight);
+        document.getElementById("genome-select-action").addEventListener("click", genome_selected);
+        return Promise.resolve()
+    }
+
+    let data = {};
+
+    const file_upload = (event) => {
+        // clean up existing divs
+        $("#content").empty();
+
+        let d = document.getElementById("content")
+        d.insertAdjacentHTML(
+            "beforeend",
+            `<div class="container-fluid row pb-3">
+                <div class="col-lg-8 mx-auto bg-light border" id="file-validation" hidden>
+                    <table class="table table-borderless m-0">
+                        <tbody id="metadata-table">
+                        </tbody>
+                    </table>
+                </div>
+            </div>`
+        )
+
+        data = {
+            newline: "\n",
+            delimiter: "\t",
+            n_of_fields: [],
+            missing_data: 0,
+            interval_count: 0,
+            interval_count_filtered: 0,
+            interval_length_total: 0,
+            interval_lengths: [],
+            chr_interval_length: {},
+            chr_interval_count: {},
+            filtered_intervals: 0,
+            zero_length_intervals: 0,
+            extends_beyond_chr: 0,
+            chr_prefix: true,
+            chromosomes: [],
+            all_chromosomes: []
+        }
+        if ($('#file-upload').prop('files')[0]) {
+            Papa.parse($('#file-upload').prop('files')[0], {
+                skipEmptyLines: true,
+                header: false,
+                delimiter: "\t",
+                step: (res, parser) => {
+                    data.interval_count += 1;
+
+                    // incorrect line ending
+                    if (!(res.meta.linebreak == "\n")) {
+                        console.log("aborting due to bad line break")
+                        data.newline = res.meta.linebreak
+                        parser.abort()
+                    }
+                    // not tab delimited
+                    if (!(res.meta.delimiter == "\t")) {
+                        console.log("aborting due to bad delimiter")
+                        data.delimiter = res.meta.delimiter
+                        parser.abort()
+                    }
+                    // most likely a delimiter issue
+                    if (res.data.length < 3) {
+                        // this file does not have at least 3 fields per line
+                        // offending line is d.interval_count with values
+                        // res.data
+                        console.log("aborting:", res.data)
+                        data.missing_data = data.interval_count
+                        parser.abort()
+                    }
+                    // collect shape of bed data
+                    if (!(data.n_of_fields.includes(res.data.length))) {
+                        data.n_of_fields.push(res.data.length)
+                    }
+
+                    let chr = res.data[0];
+                    let current_length = res.data[2] - res.data[1];
+                    // console.log("chr", chr)
+                    if (!(chr.startsWith('chr'))) {
+                        data.chr_prefix = false
+                    }
+
+                    // set the chromosome order by appearance in bed file
+                    if (!(chr in data.chr_interval_length)) {
+                        data.all_chromosomes.push(chr)
+                    }
+
+                    if (chr.match(/fix|random|alt|Un|hap/g) === null) {
+                        data.interval_count_filtered += 1;
+                        // this eval is duplicated
+                        if (!(chr in data.chr_interval_length)) {
+                            data.chromosomes.push(chr);
+                        }
+                    }
+
+                    // malformatted entry; 0-based start, 1-based end
+                    if (current_length == 0) {
+                        data.zero_length_intervals += 1;
+                    }
+
+                    data.interval_length_total += current_length;
+                    data.interval_lengths.push(current_length);
+                    data.chr_interval_length[chr] = (data.chr_interval_length[chr] || 0) + current_length;
+                    data.chr_interval_count[chr] = (data.chr_interval_count[chr] || 0) + 1;
+                },
+                complete: (res, file) => {
+                    console.log(data)
+                    // resize the upload area
+                    let el = document.getElementById("file-upload")
+                    // $(".form-control-lg::file-selector-button").attr("style", "min-height:")
+                    // show the file stats
+                    $("#file-validation").prop("hidden", false)
+                    if (!(data.delimiter == "\t")) {
+                        add_table_row({ title: "File delimiter", value: delimiter_string(data.delimiter), warn: true })
+                    } else {
+                        add_table_row({ title: "File delimiter", value: delimiter_string(data.delimiter) })
+                    }
+                    if (!(data.newline == "\n")) {
+                        add_table_row({ title: "File newline", value: newline_string(data.newline), warn: true })
+                    } else {
+                        add_table_row({ title: "File newline", value: newline_string(data.newline) })
+                    }
+                    if (!(data.missing_data == 0)) {
+                        add_table_row({ title: "Incomplete data on line", value: data.missing_data, warn: true })
+                        return
+                    }
+                    if (data.newline == "\n" && data.delimiter == "\t") {
+                        // < !--number of fields per line-- >
+                        add_table_row({ title: "BED fields", value: data.n_of_fields.join(",") })
+                        // < !--interval count-- >
+                        add_table_row({ title: "Total interval count", value: data.interval_count.toLocaleString() })
+                        // < !--total nucleotides-- >
+                        add_table_row({ title: "Total nucleotides", value: data.interval_length_total.toLocaleString() })
+                        // < !--0 - length intervals-- >
+                        add_table_row({ title: "0-length intervals", value: data.zero_length_intervals.toLocaleString() })
+                    }
+                    // show the interval size dist
+                    add_plot_div('interval-size-dist', 'Interval size distribution', 5).then(() => {
+                        var trace = {
+                            x: data.interval_lengths,
+                            type: 'histogram',
+                            marker: { color: aesthetics.palette[0], },
+                        };
+                        let layout = {
+                            height: plot_y,
+                            font: aesthetics.labelfont,
+                            padding: { t: 0, r: 0, },
+                            margin: { t: 0, r: 0, },
+                            xaxis: { title: "Interval length", automargin: true, },
+                            yaxis: { title: "Count", automargin: true, },
+                            legend: { font: { size: 16 } }
+                        };
+                        Plotly.newPlot('interval-size-dist-plot', [trace], layout, plot_config)
+                    })
+                    genome_build()
+                }
+            })
+        }
+    }
+
+    const genome_selected = () => {
+        let genome = $('#genome-select').val()
+        let chromosome_lengths;
+        jQuery.getJSON(`https://api.genome.ucsc.edu/list/chromosomes?genome=${genome}`, (d) => {
+            chromosome_lengths = d.chromosomes;
+            // adds non-chr prefixed chroms in addition to chr prefixed result
+            Object.keys(chromosome_lengths).map(k => chromosome_lengths[k.substring(3)] = chromosome_lengths[k]);
+        }).then(() => {
+            let genome_length = 0;
+            data.chromosomes.map(x => genome_length += chromosome_lengths[x]);
+            add_plot_div('interval-density', 'Interval density')
+            // length corrected for only displayed chromosomes
+            build_bar_plot(
+                data.chromosomes,
+                data.chromosomes.map(x => data.chr_interval_count[x] / data.interval_count_filtered),
+                "Chromosome",
+                "Density",
+                "interval-density-plot",
+                {
+                    x: data.chromosomes,
+                    y: data.chromosomes.map(x => (chromosome_lengths[x] / genome_length)),
+                    type: "scatter",
+                    name: "Expected",
+                    mode: "markers",
+                    marker: {
+                        size: 12, symbol: "circle", color: "#f28e2c", line: {
+                            color: 'rgb(255,255,255)',
+                            width: 1
+                        },
+                    }
+                }
+            );
+        })
     }
 
     const onChange = (event) => {
@@ -716,7 +832,7 @@
     };
 
     $(document).ready(function () {
-        // document.getElementById("file-upload").addEventListener('change', onChange);
+        document.getElementById("file-upload").addEventListener('change', file_upload);
         // document.getElementById("genome-select").addEventListener('change', onChange);
     });
 </script>
