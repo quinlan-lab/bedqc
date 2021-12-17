@@ -129,35 +129,56 @@
     </div>
 </div>
 
-<main class="container-fluid" id="content">
-    <!-- <label class="form-label">Intersect</label>
-    <div class="form-check">
-        <input class="form-check-input" type="checkbox" id="intersect-gap">
-        <label class="form-check-label" for="intersect-gap">
-            gaps
-        </label>
-    </div> -->
+<div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvas-intersect-gap"
+    aria-labelledby="offcanvas-intersect-gap-label">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="offcanvas-intersect-gap-label">Interpreting gap intersection plots</h5>
+        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+        <div class="row pb-3">
+            <div class="card-body">
+                <h3 class="card-subtitle mb-2 text-success">Normal</h3>
+                <div class="card-img-top" id="intersect-gap-normal"></div>
+                <p class="card-text pt-2">Our intervals (in this case) do not overlap the centromeres
+                    suggesting the selected genome build is <span class="fw-bold fst-italic">not
+                        incorrect</span>.
+                </p>
+            </div>
+        </div>
+        <div class="row pb-3">
+            <div class="card-body">
+                <h3 class="card-subtitle mb-2 text-warning">Potential issue</h3>
+                <div class="card-img-top" id="intersect-gap-issue"></div>
+                <p class="card-text">In most cases, when we overlap our meaningful regions
+                    with known gaps we anticipate no centromere overlap.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
 
-    <!-- Gap intersect -->
-    <!-- Our intervals (in this case) do not overlap the centromeres suggesting the selected genome build is not incorrect. -->
-    <!-- In most cases, when we overlap our meaningful regions with known gaps we anticipate no centromere overlap. -->
+<main class="container-fluid" id="content">
 </main>
 
 <div class="container">
     <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4">
-      <div class="col-md-4 d-flex align-items-center">
-        <!-- <a class="navbar-brand brand d-flex align-items-center mb-md-0 me-md-auto text-decoration-none" -->
-                <!-- href="https://github.com/quinlan-lab/bedqc">.bed qc</a> -->
-        <!-- <span class="text-muted">&copy; 2021</span> -->
-      </div>
+        <div class="col-md-4 d-flex align-items-center">
+            <!-- <a class="navbar-brand brand d-flex align-items-center mb-md-0 me-md-auto text-decoration-none" -->
+            <!-- href="https://github.com/quinlan-lab/bedqc">.bed qc</a> -->
+            <!-- <span class="text-muted">&copy; 2021</span> -->
+        </div>
 
-      <ul class="nav col-md-4 justify-content-end list-unstyled d-flex">
-        <!-- <li class="ms-3"><a class="text-muted" href="https://github.com/quinlan-lab/bedqc"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-github" viewBox="0 0 16 16"> -->
-            <!-- <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/> -->
-          <!-- </svg></a></li> -->
-      </ul>
+        <!-- <ul class="nav col-md-4 justify-content-end list-unstyled d-flex"> -->
+            <!-- <li class="ms-3"><a class="text-muted" href="https://github.com/quinlan-lab/bedqc"><svg -->
+                        <!-- xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" -->
+                        <!-- class="bi bi-github" viewBox="0 0 16 16"> -->
+                        <!-- <path -->
+                            <!-- d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z" /> -->
+                    <!-- </svg></a></li> -->
+        <!-- </ul> -->
     </footer>
-  </div>
+</div>
 
 <script type="module">
 
@@ -211,20 +232,21 @@
         ytitle: "Density"
     })
 
-    // build_example_plot({
-    //     x: ["chr1", "chr2", "chr3"],
-    //     o: [0, 0, 0],
-    //     e: [],
-    //     divid: "gap-intersect-normal",
-    //     ytitle: "Count"
-    // })
-    // build_example_plot({
-    //     x: ["chr1", "chr2", "chr3"],
-    //     o: [50, 57, 22],
-    //     e: [],
-    //     divid: "gap-intersect-issue",
-    //     ytitle: "Count"
-    // })
+    build_example_plot({
+        x: ["chr1", "chr2", "chr3"],
+        o: [0, 0, 0],
+        e: [],
+        divid: "intersect-gap-normal",
+        ytitle: "Count"
+    })
+
+    build_example_plot({
+        x: ["chr1", "chr2", "chr3"],
+        o: [50, 57, 22],
+        e: [],
+        divid: "intersect-gap-issue",
+        ytitle: "Count"
+    })
 
     const add_plot_div = (track, title, pb = 2) => {
         let d = document.getElementById("content")
@@ -315,13 +337,46 @@
         })
 
         // append a div...
-        add_plot_div(track, `${to_title(track)} intersect count`)
+        // add_plot_div(track, `${to_title(track)} intersect count`)
+
+        let d = document.getElementById("content");
+        let primary = $("#hypothesis-primary").val();
+        let secondary = $("#hypothesis-secondary").val();
+        let genome = $("#genome-select").val();
+        let exists = document.getElementById(`${primary}-${secondary}-row`);
+        // if it exists, update the title and ALL subsequent plots
+        if (exists) {
+            // update the title
+            $(`#${primary}-${secondary}-plot-title`).html(`${to_title(primary)} ${genome} ${secondary} count`)
+            // update ALL plots...
+        } else {
+            d.insertAdjacentHTML(
+                'beforeend',
+                `<div class="container-fluid row pb-5">
+                    <div class="col-lg-8 mx-auto p-0">
+                        <div class="d-flex flex-row" id="${primary}-${secondary}-row">
+                            <div class="pe-2">
+                                <h5 id="${primary}-${secondary}-plot-title">${to_title(primary)} ${genome} ${secondary} count</h5>
+                            </div>
+                            <a class="btn btn-primary btn-circle" data-bs-toggle="offcanvas" href="#offcanvas-${primary}-${secondary}" role="button" aria-controls="offcanvas-${primary}-${secondary}">?</a>
+                        </div>
+                        <div class="row pt-1" id="${primary}-${secondary}-plot-row">
+                            <div class="col-12">
+                                <div id="${primary}-${secondary}-plot"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                `
+            )
+        }
+
         build_bar_plot(
             chromosomes,
             chromosomes.map(chr => chr_count[chr]),
             "Chromosome",
             "Overlap count",
-            `${track}-plot`
+            `${primary}-${secondary}-plot`
         )
     }
 
@@ -406,7 +461,7 @@
             `<div class="container-fluid row pb-2">
                 <div class="col-lg-8 mx-auto p-0">
                     <div class="col-12 my-3" id="genome-build-anchor">
-                        <h2>Genome build</h2>
+                        <h2>Calculate interval densities</h2>
                     </div>
                     <div class="row">
                         <div class="col-3">
@@ -433,7 +488,7 @@
                     </div>
                     <div class="row">
                         <div class="col-12 py-2 text-secondary">
-                            Select the genome build of the BED file. This option can be changed later to test if other genome builds better fit these data.
+                            Select the likely genome build of the BED file.
                         </div>
                     </div>
                 </div>
@@ -513,7 +568,7 @@
                 }
             );
 
-            document.getElementById("genome-build-anchor").scrollIntoView({behavior: "smooth", block: "start"});
+            document.getElementById("genome-build-anchor").scrollIntoView({ behavior: "smooth", block: "start" });
 
             build_hypothesis_test()
         })
@@ -521,67 +576,65 @@
 
     const build_hypothesis_test = () => {
         global_data.hypothesis_test_count += 1
-
-        // Hypothesis test #1
-        // Intersect [Gap] from [hg19]
-        // Subtitle: If your intervals are coding regions and intersect with many gaps across chromosomes, [hg19] may not be the
-        // underlying genome build of [bedfile name].
+        let genome = $('#genome-select').val()
+        let filename = $('#file-upload').prop('files')[0].name
 
         let d = document.getElementById("content")
         d.insertAdjacentHTML(
             "beforeend",
             `<div class="container-fluid row pb-2">
                 <div class="col-lg-8 mx-auto p-0">
-                    <label for="genome-select" class="form-label w-100 m-0">
-                        <div class="col-12 my-3">
-                            <h2>Hypothesis test &#35;${global_data.hypothesis_test_count}</h2>
-                        </div>
-                    </label>
+                    <h2>Hypothesis test &#35;${global_data.hypothesis_test_count}</h2>
+
                     <div class="row">
                         <div class="col-3">
-                            <select class="form-select form-select-lg" id="species-select" disabled>
-                                <option selected>human</option>
+                            <select class="form-select form-select-lg" id="hypothesis-primary" disabled>
+                                <option selected value="intersect">Intersect</option>
                             </select>
                         </div>
                         <div class="col-6">
-                            <select class="form-select form-select-lg" id="genome-select">
-                                <option selected>hg38</option>
-                                <option>hg19</option>
+                            <select class="form-select form-select-lg" id="hypothesis-secondary" disabled>
+                                <option selected>gap</option>
                             </select>
                         </div>
                         <div class="col-3">
                             <div class="d-grid gap-2">
-                                <button type="button" class="btn btn-primary btn-lg position-relative" id="genome-select-action">
+                                <button type="button" class="btn btn-primary btn-lg position-relative" id="hypothesis-select-action-${global_data.hypothesis_test_count}">
                                     Apply
-                                    <span id="button-alert" class="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-light rounded-circle" hidden>
+                                    <span id="hypothesis-button-alert-${global_data.hypothesis_test_count}" class="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-light rounded-circle" hidden>
                                         <span class="visually-hidden">New alerts</span>
                                     </span>
                                 </button>
                             </div>
                         </div>
                     </div>
-                    <label for="genome-select" class="form-label w-100">
-                        <div class="row">
-                            <div class="col-12 py-2 text-secondary">
-                                Select the genome build of the BED file. This option can be changed later to test if other genome builds better fit these data.
-                            </div>
+                    <div class="row">
+                        <div class="col-12 py-2 text-secondary">
+                            If your intervals are coding regions and intersect with many gaps across
+                            chromosomes, ${genome} may not be the underlying genome build of ${filename}.
                         </div>
-                    </label>
+                    </div>
                 </div>
             </div>
             `
         )
-        bedtools_intersect("hg38", "gap", global_data.chromosomes, global_data.chr_prefix)
+
+        document.getElementById(`hypothesis-select-action-${global_data.hypothesis_test_count}`).addEventListener("click", run_hypothesis_action);
+        // document.getElementById("hypothesis-secondary").addEventListener("change", update_button);
+        return Promise.resolve()
+    }
+
+    const run_hypothesis_action = () => {
+        let genome = $('#genome-select').val();
+        let track = $("#hypothesis-secondary").val();
+        bedtools_intersect(genome, track, global_data.chromosomes, global_data.chr_prefix);
     }
 
     const update_button = (event) => {
-        // $("#genome-select-action").prop("disabled", false)
-        // show the user that they have changed the genome build and that we have to re-build the plots
         $("#button-alert").prop("hidden", false)
     }
 
     let global_data = {
-        hypothesis_test_count: 0
     };
 
     const file_upload = (event) => {
@@ -620,6 +673,7 @@
             all_chromosomes: []
         };
         global_data = {
+            hypothesis_test_count: 0,
             chr_interval_count: {},
             interval_count_filtered: 0,
             chr_prefix: true,
