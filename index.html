@@ -74,6 +74,11 @@
             border-radius: 15px;
             font-weight: bold;
         }
+
+        .btn-floating {
+            line-height: 1.95;
+            font-size: 1.4rem;
+        }
     </style>
 </head>
 
@@ -336,48 +341,43 @@
             chr_count[row[0]] = (chr_count[row[0]] || 0) + 1;
         })
 
-        // append a div...
-        // add_plot_div(track, `${to_title(track)} intersect count`)
-
         let d = document.getElementById("content");
-        let primary = $("#hypothesis-primary").val();
-        let secondary = $("#hypothesis-secondary").val();
-        let genome = $("#genome-select").val();
-        let exists = document.getElementById(`${primary}-${secondary}-row`);
-        // if it exists, update the title and ALL subsequent plots
-        if (exists) {
-            // update the title
-            $(`#${primary}-${secondary}-plot-title`).html(`${to_title(primary)} ${genome} ${secondary} count`)
-            // update ALL plots...
-        } else {
-            d.insertAdjacentHTML(
-                'beforeend',
-                `<div class="container-fluid row pb-5">
-                    <div class="col-lg-8 mx-auto p-0">
-                        <div class="d-flex flex-row" id="${primary}-${secondary}-row">
-                            <div class="pe-2">
-                                <h5 id="${primary}-${secondary}-plot-title">${to_title(primary)} ${genome} ${secondary} count</h5>
-                            </div>
-                            <a class="btn btn-primary btn-circle" data-bs-toggle="offcanvas" href="#offcanvas-${primary}-${secondary}" role="button" aria-controls="offcanvas-${primary}-${secondary}">?</a>
+        let idx = global_data.hypothesis_test_count;
+        let primary = $(`#hypothesis-primary-${idx}`).val();
+        let secondary = $(`#hypothesis-secondary-${idx}`).val();
+        let genome = $(`#hypothesis-genome-${idx}`).val();
+
+        d.insertAdjacentHTML(
+            'beforeend',
+            `<div class="container-fluid row pb-5">
+                <div class="col-lg-8 mx-auto p-0">
+                    <div class="d-flex flex-row">
+                        <div class="pe-2">
+                            <h5>${to_title(primary)} ${genome} ${secondary} count</h5>
                         </div>
-                        <div class="row pt-1" id="${primary}-${secondary}-plot-row">
-                            <div class="col-12">
-                                <div id="${primary}-${secondary}-plot"></div>
-                            </div>
+                        <a class="btn btn-primary btn-circle" data-bs-toggle="offcanvas" href="#offcanvas-${primary}-${secondary}" role="button" aria-controls="offcanvas-${primary}-${secondary}">?</a>
+                    </div>
+                    <div class="row pt-1">
+                        <div class="col-12">
+                            <div id="hypothesis-${idx}-plot"></div>
                         </div>
                     </div>
                 </div>
-                `
-            )
-        }
+            </div>
+            `
+        )
 
         build_bar_plot(
             chromosomes,
             chromosomes.map(chr => chr_count[chr]),
             "Chromosome",
             "Overlap count",
-            `${primary}-${secondary}-plot`
+            `hypothesis-${idx}-plot`
         )
+        document.getElementById(`hypothesis-${idx}-anchor`).scrollIntoView({ behavior: "smooth", block: "start" });
+
+        // create new test
+        build_hypothesis_test()
     }
 
     const bedtools_intersect = async (genome, track, chromosomes, prefix) => {
@@ -406,9 +406,10 @@
             let str = "";
             bed.map(a => str += a.join("\t") + "\n");
             CLI.fs.writeFile("b.bed", str);
-        }).then(() => {
-            cli(track, chromosomes)
+        }).then(async () => {
+            await cli(track, chromosomes)
         })
+        return Promise.resolve()
     }
 
     // const checkbox_change = (event) => {
@@ -464,20 +465,26 @@
                         <h2>Calculate interval densities</h2>
                     </div>
                     <div class="row">
-                        <div class="col-3">
-                            <select class="form-select form-select-lg" id="species-select" disabled>
-                                <option selected>human</option>
-                            </select>
+                        <div class="col-4">
+                            <div class="form-floating">
+                                <select class="form-select" id="species-select">
+                                    <option selected>human</option>
+                                </select>
+                                <label for="species-select">Species</label>
+                            </div>
                         </div>
-                        <div class="col-6">
-                            <select class="form-select form-select-lg" id="genome-select">
-                                <option selected>hg38</option>
-                                <option>hg19</option>
-                            </select>
+                        <div class="col-7">
+                            <div class="form-floating">
+                                <select class="form-select" id="genome-select">
+                                    <option selected>hg38</option>
+                                    <option>hg19</option>
+                                </select>
+                                <label for="genome-select">Genome build</label>
+                            </div>
                         </div>
-                        <div class="col-3">
+                        <div class="col-1">
                             <div class="d-grid gap-2">
-                                <button type="button" class="btn btn-primary btn-lg position-relative" id="genome-select-action">
+                                <button type="button" class="btn btn-primary btn-floating position-relative" id="genome-select-action">
                                     Apply
                                     <span id="button-alert" class="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-light rounded-circle" hidden>
                                         <span class="visually-hidden">New alerts</span>
@@ -514,8 +521,6 @@
         }).then(() => {
             let genome_length = 0;
             global_data.chromosomes.map(x => genome_length += chromosome_lengths[x]);
-
-            // add_plot_div('interval-density', `Interval density across ${genome}`, 5)
 
             let d = document.getElementById("content")
             let exists = document.getElementById(`interval-density-row`);
@@ -570,46 +575,66 @@
 
             document.getElementById("genome-build-anchor").scrollIntoView({ behavior: "smooth", block: "start" });
 
-            build_hypothesis_test()
+            console.log(global_data.hypothesis_test_count)
+            if (global_data.hypothesis_test_count == 0) {
+                build_hypothesis_test()
+            }
         })
     }
 
     const build_hypothesis_test = () => {
         global_data.hypothesis_test_count += 1
+        let idx = global_data.hypothesis_test_count
         let genome = $('#genome-select').val()
         let filename = $('#file-upload').prop('files')[0].name
+        // defaults
+        let primary = "intersect"
+        let secondary = "gap"
+        let title = `${to_title(primary)} ${genome} ${secondary} count`
 
         let d = document.getElementById("content")
         d.insertAdjacentHTML(
             "beforeend",
             `<div class="container-fluid row pb-2">
-                <div class="col-lg-8 mx-auto p-0">
-                    <h2>Hypothesis test &#35;${global_data.hypothesis_test_count}</h2>
+                <div class="col-lg-8 mx-auto p-0" id="hypothesis-${idx}-anchor">
+                    <h2>Hypothesis test &#35;${idx}</h2>
 
                     <div class="row">
-                        <div class="col-3">
-                            <select class="form-select form-select-lg" id="hypothesis-primary" disabled>
-                                <option selected value="intersect">Intersect</option>
-                            </select>
+                        <div class="col">
+                            <div class="form-floating">
+                                <select class="form-select hyp-test" id="hypothesis-primary-${idx}">
+                                    <option selected value="intersect">Intersect</option>
+                                </select>
+                                <label for="hypothesis-primary-${idx}">Action</label>
+                            </div>
                         </div>
-                        <div class="col-6">
-                            <select class="form-select form-select-lg" id="hypothesis-secondary" disabled>
-                                <option selected>gap</option>
-                            </select>
+                        <div class="col">
+                            <div class="form-floating">
+                                <select class="form-select hyp-test" id="hypothesis-genome-${idx}">
+                                    <option>hg38</option>
+                                    <option>hg19</option>
+                                </select>
+                                <label for="hypothesis-genome-${idx}">Genome build</label>
+                            </div>
                         </div>
-                        <div class="col-3">
+                        <div class="col">
+                            <div class="form-floating">
+                                <select class="form-select hyp-test" id="hypothesis-secondary-${idx}">
+                                    <option selected>gap</option>
+                                </select>
+                                <label for="hypothesis-secondary-${idx}">Table</label>
+                            </div>
+                        </div>
+                        <div class="col-1">
                             <div class="d-grid gap-2">
-                                <button type="button" class="btn btn-primary btn-lg position-relative" id="hypothesis-select-action-${global_data.hypothesis_test_count}">
+                                <button type="button" class="btn btn-primary btn-floating position-relative hyp-test" id="hypothesis-select-action-${idx}">
                                     Apply
-                                    <span id="hypothesis-button-alert-${global_data.hypothesis_test_count}" class="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-light rounded-circle" hidden>
-                                        <span class="visually-hidden">New alerts</span>
-                                    </span>
                                 </button>
                             </div>
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-12 py-2 text-secondary">
+                        <div class="col-12 py-2 text-secondary" id="hypothesis-blurb-${idx}">
                             If your intervals are coding regions and intersect with many gaps across
                             chromosomes, ${genome} may not be the underlying genome build of ${filename}.
                         </div>
@@ -619,15 +644,41 @@
             `
         )
 
-        document.getElementById(`hypothesis-select-action-${global_data.hypothesis_test_count}`).addEventListener("click", run_hypothesis_action);
-        // document.getElementById("hypothesis-secondary").addEventListener("change", update_button);
+        $(`#hypothesis-genome-${idx}`).val(genome);
+
+        document.getElementById(`hypothesis-select-action-${idx}`).addEventListener("click", run_hypothesis_action);
+        let elements = document.getElementsByClassName("form-select hyp-test");
+        Array.from(elements).forEach(function(element) {
+            element.addEventListener('change', update_hypothesis_blurb);
+        });
+
+        // document.getElementsByClassName("")
         return Promise.resolve()
     }
 
-    const run_hypothesis_action = () => {
-        let genome = $('#genome-select').val();
-        let track = $("#hypothesis-secondary").val();
-        bedtools_intersect(genome, track, global_data.chromosomes, global_data.chr_prefix);
+    const run_hypothesis_action = async () => {
+        let idx = global_data.hypothesis_test_count
+        let genome = $(`#hypothesis-genome-${idx}`).val();
+        let track = $(`#hypothesis-secondary-${idx}`).val();
+        await bedtools_intersect(genome, track, global_data.chromosomes, global_data.chr_prefix)
+        // disable the components of the current test
+        $( ".hyp-test:enabled" ).prop("disabled", true);
+    }
+
+    const update_hypothesis_blurb = (event) => {
+        let idx = global_data.hypothesis_test_count
+        let filename = $('#file-upload').prop('files')[0].name
+        let primary = $(`#hypothesis-primary-${idx}`).val()
+        let secondary = $(`#hypothesis-secondary-${idx}`).val()
+        let genome = $(`#hypothesis-genome-${idx}`).val();
+        let str = "";
+
+        if (primary == "intersect") {
+            if (secondary == "gap") {
+                str = `If your intervals are coding regions and intersect with many gaps across chromosomes, ${genome} may not be the underlying genome build of ${filename}.`
+            }
+        }
+        $(`#hypothesis-blurb-${idx}`).html(str)
     }
 
     const update_button = (event) => {
@@ -810,195 +861,6 @@
         }
     }
 
-    const onChange = (event) => {
-        document.getElementById("intersect-gap").addEventListener('change', checkbox_change);
-
-        let genome = $('#genome-select').val()
-        let chromosome_lengths;
-        jQuery.getJSON(`https://api.genome.ucsc.edu/list/chromosomes?genome=${genome}`, (d) => {
-            chromosome_lengths = d.chromosomes
-            // adds non-chr prefixed chroms in addition to chr prefixed result
-            Object.keys(chromosome_lengths).map(k => chromosome_lengths[k.substring(3)] = chromosome_lengths[k])
-        }).then(() => {
-            let interval_length = {}
-            let interval_count = {}
-            // new upload
-            m = {
-                interval_count: 0,
-                interval_count_filtered: 0,
-                interval_length_total: 0,
-                interval_lengths: [],
-                filtered_intervals: 0,
-                zero_length_intervals: 0,
-                extends_beyond_chr: 0,
-                chr_prefix: true,
-                chromosomes: [],
-                all_chromosomes: []
-            }
-            if ($('#file-upload').prop('files')[0]) {
-                Papa.parse($('#file-upload').prop('files')[0], {
-                    delimiter: "\t",
-                    skipEmptyLines: false,
-                    newline: "\n",
-                    header: false,
-                    step: (results, parser) => {
-                        m.interval_count += 1;
-                        // check number of toks testing the delimiter
-                        // likely going to need lengths in the future
-                        let chr = results.data[0];
-                        // skip unhelpful chromosomes
-                        if (chr.match(/fix|random|alt|Un|hap/g) === null) {
-                            m.interval_count_filtered += 1;
-                            if (results.data.length < 3) {
-                                // invalid format or separator
-                                // raise format error
-                                results.data = []
-                                console.log("invalid format (chrom, start, stop) or separator ('\\t')")
-                                return
-                            }
-
-                            // check for 'chr' prefix
-                            if (!(chr.startsWith('chr'))) {
-                                m.chr_prefix = false
-                                // will need to check if some have chr and some do not
-                            }
-
-                            // set the chromosome order by appearance in bed file
-                            if (!(chr in interval_length)) {
-                                m.chromosomes.push(chr);
-                            }
-
-                            // malformatted entry; 0-based start, 1-based end
-                            let current_length = results.data[2] - results.data[1]
-                            if (current_length == 0) {
-                                m.zero_length_intervals += 1
-                            }
-
-                            m.interval_length_total += current_length
-
-                            // check if end extends beyond chrom end
-                            // this could also be a plot
-
-                            m.interval_lengths.push(current_length)
-                            interval_length[chr] = (interval_length[chr] || 0) + current_length;
-                            interval_count[chr] = (interval_count[chr] || 0) + 1;
-                        }
-                        else {
-                            m.filtered_intervals += 1
-                        }
-                    },
-                    complete: (results, file) => {
-
-                        var element = document.getElementById("results-tab");
-                        element.classList.remove("disabled");
-
-                        var someTabTriggerEl = document.querySelector('#results-tab')
-                        var tab = new bootstrap.Tab(someTabTriggerEl)
-                        tab.show()
-
-                        $("#summary-filename").html(file.name)
-                        $("#summary-interval-count").html(m.interval_count.toLocaleString())
-                        $("#summary-total-bp").html(m.interval_length_total.toLocaleString())
-                        if (m.filtered_intervals > 0) {
-                            add_table_row({
-                                title: "Filtered intervals",
-                                value: m.filtered_intervals.toLocaleString()
-                            })
-                        }
-                        if (m.zero_length_intervals > 0) {
-                            add_table_row({
-                                title: "0-length intervals",
-                                value: m.zero_length_intervals.toLocaleString()
-                            })
-                        }
-
-                        add_plot_div('interval-density', 'Interval density')
-                        // length corrected for only displayed chromosomes
-                        let genome_length = 0
-                        m.chromosomes.map(x => genome_length += chromosome_lengths[x])
-
-                        build_bar_plot(
-                            m.chromosomes,
-                            m.chromosomes.map(x => interval_count[x] / m.interval_count_filtered),
-                            "Chromosome",
-                            "Density",
-                            "interval-density-plot",
-                            {
-                                x: m.chromosomes,
-                                y: m.chromosomes.map(x => (chromosome_lengths[x] / genome_length)),
-                                type: "scatter",
-                                name: "Expected",
-                                mode: "markers",
-                                marker: {
-                                    size: 12, symbol: "circle", color: "#f28e2c", line: {
-                                        color: 'rgb(255,255,255)',
-                                        width: 1
-                                    },
-                                }
-                            }
-                        );
-                        add_plot_div('interval-size-dist', 'Interval size distribution').then(() => {
-                            var trace = {
-                                x: m.interval_lengths,
-                                type: 'histogram',
-                                marker: {
-                                    color: aesthetics.palette[0],
-                                },
-                            };
-                            let layout = {
-                                height: aesthetics.height,
-                                font: aesthetics.labelfont,
-                                padding: {
-                                    t: 0,
-                                    r: 0,
-                                },
-                                margin: {
-                                    t: 0,
-                                    r: 0,
-                                },
-                                xaxis: {
-                                    title: "Interval length",
-                                    automargin: true,
-                                },
-                                yaxis: {
-                                    title: "Count",
-                                    automargin: true,
-                                },
-                                legend: {
-                                    font: {
-                                        size: 16
-                                    }
-                                }
-                            };
-                            Plotly.newPlot('interval-size-dist-plot', [trace], layout, plot_config)
-                        })
-
-                        // handle checkboxes
-                        handle_checkboxes({
-                            file: file,
-                            genome: genome,
-                            chroms: m.chromosomes,
-                            chr_prefix: m.chr_prefix
-                        })
-                    }
-                })
-            }
-        })
-    }
-
-    // const mean = (data) => {
-    //     let result = 0;
-    //     let n = 0;
-    //     for (let i = 0; i < data.length; i++) {
-    //         let d = data[i];
-    //         if (d >= 0) {
-    //             n += 1;
-    //             result += d;
-    //         }
-    //     }
-    //     return result / n;
-    // };
-
     const build_bar_plot = (chrs, o, x_title, y_title, div, trace = false) => {
         let traces = [
             {
@@ -1053,7 +915,6 @@
 
     $(document).ready(function () {
         document.getElementById("file-upload").addEventListener('change', file_upload);
-        // document.getElementById("genome-select").addEventListener('change', onChange);
     });
 </script>
 
