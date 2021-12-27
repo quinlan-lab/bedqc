@@ -65,14 +65,18 @@
         }
 
         .btn-circle {
-            width: 23px;
-            height: 23px;
+            width: 18px;
+            height: 18px;
             text-align: center;
             padding: 4px 0;
             font-size: 14px;
-            line-height: 0.9;
+            line-height: 0.5;
             border-radius: 15px;
             font-weight: bold;
+        }
+
+        .text-primary code {
+            color: rgba(var(--bs-primary-rgb),var(--bs-text-opacity)) !important
         }
 
         .btn-floating {
@@ -350,7 +354,7 @@
         d.insertAdjacentHTML(
             'beforeend',
             `<div class="container-fluid row pb-3">
-                <div class="d-flex col-lg-1 justify-content-end"><code>Out[${idx}]</code></div>
+                <div class="d-flex col-1 justify-content-end"><code>Out[${idx}]</code></div>
                 <div class="col-lg-10 p-0">
                     <div class="d-flex flex-row">
                         <div class="pe-2">
@@ -446,12 +450,12 @@
         d.insertAdjacentHTML(
             "beforeend",
             `<div class="container-fluid row pb-2">
-                <div class="d-flex col-lg-1 justify-content-end">
+                <div class="d-flex col-1 text-primary justify-content-end">
                     <code>In [${idx}]</code>
                 </div>
-                <div class="col-lg-11 bg-light border p-2" id="hypothesis-${idx}-anchor">
+                <div class="col-lg-11 col-sm-12 bg-light border p-2" id="hypothesis-${idx}-anchor">
                     <div class="row">
-                        <div class="col">
+                        <div class="col col-sm-4">
                             <div class="form-floating">
                                 <select class="form-select hyp-test" id="hypothesis-primary-${idx}">
                                     <option selected>Calculate interval densities</option>
@@ -460,7 +464,7 @@
                                 <label for="hypothesis-primary-${idx}">Action</label>
                             </div>
                         </div>
-                        <div class="col">
+                        <div class="col col-sm-3">
                             <div class="form-floating">
                                 <select class="form-select hyp-test" id="hypothesis-genome-${idx}">
                                     <option>hg38</option>
@@ -469,7 +473,7 @@
                                 <label for="hypothesis-genome-${idx}">Genome build</label>
                             </div>
                         </div>
-                        <div class="col" id="hypothesis-secondary-wrapper-${idx}" hidden>
+                        <div class="col col-sm-4" id="hypothesis-secondary-wrapper-${idx}" hidden>
                             <div class="form-floating">
                                 <select class="form-select hyp-test" id="hypothesis-secondary-${idx}">
                                     <option selected>gap</option>
@@ -538,7 +542,7 @@
                 d.insertAdjacentHTML(
                     'beforeend',
                     `<div class="container-fluid row pb-3">
-                        <div class="d-flex col-lg-1 justify-content-end"><code>Out[${idx}]</code></div>
+                        <div class="d-flex col-1 justify-content-end"><code>Out[${idx}]</code></div>
                         <div class="col-lg-10 p-0">
                             <div class="d-flex flex-row">
                                 <div class="pe-2">
