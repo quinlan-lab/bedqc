@@ -134,7 +134,7 @@
     </div>
 </div>
 
-<div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvas-intersect-gap"
+<div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvas-Intersect-gap"
     aria-labelledby="offcanvas-intersect-gap-label">
     <div class="offcanvas-header">
         <h5 class="offcanvas-title" id="offcanvas-intersect-gap-label">Interpreting gap intersection plots</h5>
@@ -175,12 +175,12 @@
         </div>
 
         <!-- <ul class="nav col-md-4 justify-content-end list-unstyled d-flex"> -->
-            <!-- <li class="ms-3"><a class="text-muted" href="https://github.com/quinlan-lab/bedqc"><svg -->
-                        <!-- xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" -->
-                        <!-- class="bi bi-github" viewBox="0 0 16 16"> -->
-                        <!-- <path -->
-                            <!-- d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z" /> -->
-                    <!-- </svg></a></li> -->
+        <!-- <li class="ms-3"><a class="text-muted" href="https://github.com/quinlan-lab/bedqc"><svg -->
+        <!-- xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" -->
+        <!-- class="bi bi-github" viewBox="0 0 16 16"> -->
+        <!-- <path -->
+        <!-- d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z" /> -->
+        <!-- </svg></a></li> -->
         <!-- </ul> -->
     </footer>
 </div>
@@ -309,13 +309,6 @@
         return str
     }
 
-    // arr.sort(function (a, b) {
-    //     let _a = strip_prefix(a)
-    //     let _b = strip_prefix(b)
-    //     console.log(_a, _b)
-    //     return _a - _b || _a > _b
-    // });
-
     let chromosome_lengths = {};
     let prefix = true
 
@@ -328,10 +321,15 @@
         )
     }
 
-    const cli = async (track, chromosomes) => {
-        let l = await CLI.ls(".")
-        console.log(l)
+    const scroll_to = (id) => {
+        const yOffset = -10;
+        const element = document.getElementById(id);
+        const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
 
+        window.scrollTo({top: y, behavior: 'smooth'});
+    }
+
+    const cli = async (track, chromosomes) => {
         // intersect user upload and UCSC track
         let o = await CLI.exec(`bedtools intersect -sorted -a a.bed -b b.bed`)
         o = o.split("\n").map(p => p.split("\t"))
@@ -342,18 +340,21 @@
         })
 
         let d = document.getElementById("content");
-        let idx = global_data.hypothesis_test_count;
+        let idx = global_data.input_test_count;
         let primary = $(`#hypothesis-primary-${idx}`).val();
         let secondary = $(`#hypothesis-secondary-${idx}`).val();
         let genome = $(`#hypothesis-genome-${idx}`).val();
 
+        console.log("offcanvas", primary, secondary)
+
         d.insertAdjacentHTML(
             'beforeend',
-            `<div class="container-fluid row pb-5">
-                <div class="col-lg-8 mx-auto p-0">
+            `<div class="container-fluid row pb-3">
+                <div class="d-flex col-lg-1 justify-content-end"><code>Out[${idx}]</code></div>
+                <div class="col-lg-10 p-0">
                     <div class="d-flex flex-row">
                         <div class="pe-2">
-                            <h5>${to_title(primary)} ${genome} ${secondary} count</h5>
+                            <h6>${to_title(primary)} ${genome} ${secondary} count</h6>
                         </div>
                         <a class="btn btn-primary btn-circle" data-bs-toggle="offcanvas" href="#offcanvas-${primary}-${secondary}" role="button" aria-controls="offcanvas-${primary}-${secondary}">?</a>
                     </div>
@@ -374,10 +375,10 @@
             "Overlap count",
             `hypothesis-${idx}-plot`
         )
-        document.getElementById(`hypothesis-${idx}-anchor`).scrollIntoView({ behavior: "smooth", block: "start" });
+        scroll_to(`hypothesis-${idx}-anchor`)
 
         // create new test
-        build_hypothesis_test()
+        build_input_test()
     }
 
     const bedtools_intersect = async (genome, track, chromosomes, prefix) => {
@@ -412,30 +413,6 @@
         return Promise.resolve()
     }
 
-    // const checkbox_change = (event) => {
-    //     if (event.target.checked == false) {
-    //         // remove the div of the unchecked intersection
-    //         // intersect-gap and need to remove gap-row, gap-plot-row
-    //         let pfx = event.target.id.split("-")[1]
-    //         document.getElementById(`${pfx}-row`).remove()
-    //         document.getElementById(`${pfx}-plot-row`).remove()
-    //     } else {
-    //         let file = $('#file-upload').prop('files')[0]
-    //         let genome = $('#genome-select').val()
-    //         if ($("#intersect-gap").prop("checked") == true) {
-    //             bedtools_intersect(genome, "gap", m.chromosomes, m.chr_prefix)
-    //         }
-    //         // additional checkboxes
-    //     }
-    // }
-
-    // const handle_checkboxes = ({ file, genome, chroms, chr_prefix }) => {
-    //     if ($("#intersect-gap").prop("checked") == true) {
-    //         bedtools_intersect(genome, "gap", chroms, chr_prefix)
-    //     }
-    //     // additional checkboxes
-    // }
-
     const delimiter_string = (sep) => {
         if (sep == "\t") {
             return "\\t"
@@ -454,156 +431,31 @@
         }
     }
 
-    const genome_build = () => {
-        let d = document.getElementById("content")
-
-        d.insertAdjacentHTML(
-            "beforeend",
-            `<div class="container-fluid row pb-2">
-                <div class="col-lg-8 mx-auto p-0">
-                    <div class="col-12 my-3" id="genome-build-anchor">
-                        <h2>Calculate interval densities</h2>
-                    </div>
-                    <div class="row">
-                        <div class="col-4">
-                            <div class="form-floating">
-                                <select class="form-select" id="species-select">
-                                    <option selected>human</option>
-                                </select>
-                                <label for="species-select">Species</label>
-                            </div>
-                        </div>
-                        <div class="col-7">
-                            <div class="form-floating">
-                                <select class="form-select" id="genome-select">
-                                    <option selected>hg38</option>
-                                    <option>hg19</option>
-                                </select>
-                                <label for="genome-select">Genome build</label>
-                            </div>
-                        </div>
-                        <div class="col-1">
-                            <div class="d-grid gap-2">
-                                <button type="button" class="btn btn-primary btn-floating position-relative" id="genome-select-action">
-                                    Apply
-                                    <span id="button-alert" class="position-absolute top-0 start-100 translate-middle p-2 bg-danger border border-light rounded-circle" hidden>
-                                        <span class="visually-hidden">New alerts</span>
-                                    </span>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-12 py-2 text-secondary">
-                            Select the likely genome build of the BED file.
-                        </div>
-                    </div>
-                </div>
-            </div>
-            `
-        )
-        document.getElementById("genome-select-action").addEventListener("click", genome_selected);
-        document.getElementById("genome-select").addEventListener("change", update_button);
-        return Promise.resolve()
-    }
-
-    const genome_selected = () => {
-        // button was clicked, show user a check that we're done
-        // $("#genome-select-action").prop("disabled", true)
-        $("#button-alert").prop("hidden", true)
-
-        let genome = $('#genome-select').val()
-        let chromosome_lengths;
-        jQuery.getJSON(`https://api.genome.ucsc.edu/list/chromosomes?genome=${genome}`, (d) => {
-            chromosome_lengths = d.chromosomes;
-            // adds non-chr prefixed chroms in addition to chr prefixed result
-            Object.keys(chromosome_lengths).map(k => chromosome_lengths[k.substring(3)] = chromosome_lengths[k]);
-        }).then(() => {
-            let genome_length = 0;
-            global_data.chromosomes.map(x => genome_length += chromosome_lengths[x]);
-
-            let d = document.getElementById("content")
-            let exists = document.getElementById(`interval-density-row`);
-
-            // if it exists, update the title and ALL subsequent plots
-            if (exists) {
-                // update the title
-                $("#interval-density-plot-title").html(`Interval density across ${genome}`)
-                // update ALL plots...
-            } else {
-                d.insertAdjacentHTML(
-                    'beforeend',
-                    `<div class="container-fluid row pb-5">
-                        <div class="col-lg-8 mx-auto p-0">
-                            <div class="d-flex flex-row" id="interval-density-row">
-                                <div class="pe-2">
-                                    <h5 id="interval-density-plot-title">Interval density across ${genome}</h5>
-                                </div>
-                                <a class="btn btn-primary btn-circle" data-bs-toggle="offcanvas" href="#offcanvas-interval-density" role="button" aria-controls="offcanvas-interval-density">?</a>
-                            </div>
-                            <div class="row pt-1" id="interval-density-plot-row">
-                                <div class="col-12">
-                                    <div id="interval-density-plot"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    `
-                )
-            }
-
-            build_bar_plot(
-                global_data.chromosomes,
-                global_data.chromosomes.map(x => global_data.chr_interval_count[x] / global_data.interval_count_filtered),
-                "Chromosome",
-                "Density",
-                "interval-density-plot",
-                {
-                    x: global_data.chromosomes,
-                    y: global_data.chromosomes.map(x => (chromosome_lengths[x] / genome_length)),
-                    type: "scatter",
-                    name: "Expected",
-                    mode: "markers",
-                    marker: {
-                        size: 12, symbol: "circle", color: "#f28e2c", line: {
-                            color: 'rgb(255,255,255)',
-                            width: 1
-                        },
-                    }
-                }
-            );
-
-            document.getElementById("genome-build-anchor").scrollIntoView({ behavior: "smooth", block: "start" });
-
-            console.log(global_data.hypothesis_test_count)
-            if (global_data.hypothesis_test_count == 0) {
-                build_hypothesis_test()
-            }
-        })
-    }
-
-    const build_hypothesis_test = () => {
-        global_data.hypothesis_test_count += 1
-        let idx = global_data.hypothesis_test_count
-        let genome = $('#genome-select').val()
+    const build_input_test = () => {
+        global_data.input_test_count += 1
+        let idx = global_data.input_test_count
+        let genome = global_data.previous_genome
         let filename = $('#file-upload').prop('files')[0].name
         // defaults
-        let primary = "intersect"
+        let primary = global_data.previous_input_action
         let secondary = "gap"
         let title = `${to_title(primary)} ${genome} ${secondary} count`
 
         let d = document.getElementById("content")
+
         d.insertAdjacentHTML(
             "beforeend",
             `<div class="container-fluid row pb-2">
-                <div class="col-lg-8 mx-auto p-0" id="hypothesis-${idx}-anchor">
-                    <h2>Hypothesis test &#35;${idx}</h2>
-
+                <div class="d-flex col-lg-1 justify-content-end">
+                    <code>In [${idx}]</code>
+                </div>
+                <div class="col-lg-11 bg-light border p-2" id="hypothesis-${idx}-anchor">
                     <div class="row">
                         <div class="col">
                             <div class="form-floating">
                                 <select class="form-select hyp-test" id="hypothesis-primary-${idx}">
-                                    <option selected value="intersect">Intersect</option>
+                                    <option selected>Calculate interval densities</option>
+                                    <option>Intersect</option>
                                 </select>
                                 <label for="hypothesis-primary-${idx}">Action</label>
                             </div>
@@ -617,7 +469,7 @@
                                 <label for="hypothesis-genome-${idx}">Genome build</label>
                             </div>
                         </div>
-                        <div class="col">
+                        <div class="col" id="hypothesis-secondary-wrapper-${idx}" hidden>
                             <div class="form-floating">
                                 <select class="form-select hyp-test" id="hypothesis-secondary-${idx}">
                                     <option selected>gap</option>
@@ -635,8 +487,6 @@
                     </div>
                     <div class="row">
                         <div class="col-12 py-2 text-secondary" id="hypothesis-blurb-${idx}">
-                            If your intervals are coding regions and intersect with many gaps across
-                            chromosomes, ${genome} may not be the underlying genome build of ${filename}.
                         </div>
                     </div>
                 </div>
@@ -644,36 +494,115 @@
             `
         )
 
+        $(`#hypothesis-primary-${idx}`).val(global_data.previous_input_action)
         $(`#hypothesis-genome-${idx}`).val(genome);
 
+        update_hypothesis_blurb();
+
+        if (!(global_data.previous_input_action == "Calculate interval densities")) {
+            // show all selects
+            $(`#hypothesis-secondary-wrapper-${idx}`).prop("hidden", false)
+        }
+
+        // 'apply' click
         document.getElementById(`hypothesis-select-action-${idx}`).addEventListener("click", run_hypothesis_action);
+        // select input changes
         let elements = document.getElementsByClassName("form-select hyp-test");
-        Array.from(elements).forEach(function(element) {
+        Array.from(elements).forEach(function (element) {
             element.addEventListener('change', update_hypothesis_blurb);
         });
 
-        // document.getElementsByClassName("")
         return Promise.resolve()
     }
 
     const run_hypothesis_action = async () => {
-        let idx = global_data.hypothesis_test_count
+        let idx = global_data.input_test_count
+        let action = $(`#hypothesis-primary-${idx}`).val()
         let genome = $(`#hypothesis-genome-${idx}`).val();
         let track = $(`#hypothesis-secondary-${idx}`).val();
-        await bedtools_intersect(genome, track, global_data.chromosomes, global_data.chr_prefix)
+
+        global_data.previous_input_action = action
+        global_data.previous_genome = genome
+
+        if (action == "Calculate interval densities") {
+            let chromosome_lengths;
+            jQuery.getJSON(`https://api.genome.ucsc.edu/list/chromosomes?genome=${genome}`, (d) => {
+                chromosome_lengths = d.chromosomes;
+                // adds non-chr prefixed chroms in addition to chr prefixed result
+                Object.keys(chromosome_lengths).map(k => chromosome_lengths[k.substring(3)] = chromosome_lengths[k]);
+            }).then(() => {
+                let genome_length = 0;
+                global_data.chromosomes.map(x => genome_length += chromosome_lengths[x]);
+
+                let d = document.getElementById("content")
+                d.insertAdjacentHTML(
+                    'beforeend',
+                    `<div class="container-fluid row pb-3">
+                        <div class="d-flex col-lg-1 justify-content-end"><code>Out[${idx}]</code></div>
+                        <div class="col-lg-10 p-0">
+                            <div class="d-flex flex-row">
+                                <div class="pe-2">
+                                    <h6 id="interval-density-plot-title">Interval density across ${genome}</h6>
+                                </div>
+                                <a class="btn btn-primary btn-circle" data-bs-toggle="offcanvas" href="#offcanvas-interval-density" role="button" aria-controls="offcanvas-interval-density">?</a>
+                            </div>
+                            <div class="row pt-1">
+                                <div class="col-12">
+                                    <div id="hypothesis-${idx}-plot"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    `
+                )
+
+                build_bar_plot(
+                    global_data.chromosomes,
+                    global_data.chromosomes.map(x => global_data.chr_interval_count[x] / global_data.interval_count_filtered),
+                    "Chromosome",
+                    "Density",
+                    `hypothesis-${idx}-plot`,
+                    {
+                        x: global_data.chromosomes,
+                        y: global_data.chromosomes.map(x => (chromosome_lengths[x] / genome_length)),
+                        type: "scatter",
+                        name: "Expected",
+                        mode: "markers",
+                        marker: {
+                            size: 12, symbol: "circle", color: "#f28e2c", line: {
+                                color: 'rgb(255,255,255)',
+                                width: 1
+                            },
+                        }
+                    }
+                );
+                scroll_to(`hypothesis-${idx}-anchor`)
+                // create new test
+                build_input_test()
+            })
+        } else if (action == "Intersect") {
+            await bedtools_intersect(genome, track, global_data.chromosomes, global_data.chr_prefix)
+        } else {
+            console.log("Unaccounted for action selected.")
+        }
         // disable the components of the current test
-        $( ".hyp-test:enabled" ).prop("disabled", true);
+        $(".hyp-test:enabled").prop("disabled", true);
     }
 
     const update_hypothesis_blurb = (event) => {
-        let idx = global_data.hypothesis_test_count
+        let idx = global_data.input_test_count
         let filename = $('#file-upload').prop('files')[0].name
         let primary = $(`#hypothesis-primary-${idx}`).val()
         let secondary = $(`#hypothesis-secondary-${idx}`).val()
         let genome = $(`#hypothesis-genome-${idx}`).val();
         let str = "";
 
-        if (primary == "intersect") {
+        if (primary == "Calculate interval densities") {
+            str = `Select the genome build of ${filename}.`
+            // hide the secondary select box
+            $(`#hypothesis-secondary-wrapper-${idx}`).prop("hidden", true)
+        } else if (primary == "Intersect") {
+            $(`#hypothesis-secondary-wrapper-${idx}`).prop("hidden", false)
             if (secondary == "gap") {
                 str = `If your intervals are coding regions and intersect with many gaps across chromosomes, ${genome} may not be the underlying genome build of ${filename}.`
             }
@@ -724,10 +653,12 @@
             all_chromosomes: []
         };
         global_data = {
-            hypothesis_test_count: 0,
+            input_test_count: 0,
             chr_interval_count: {},
             interval_count_filtered: 0,
             chr_prefix: true,
+            previous_input_action: "Calculate interval densities",
+            previous_genome: "hg38",
             chromosomes: []
         }
         if ($('#file-upload').prop('files')[0]) {
@@ -766,7 +697,6 @@
 
                     let chr = res.data[0];
                     let current_length = res.data[2] - res.data[1];
-                    // console.log("chr", chr)
                     if (!(chr.startsWith('chr'))) {
                         global_data.chr_prefix = false
                     }
@@ -851,7 +781,7 @@
                     bed.sort(function (a, b) {
                         return a[0] > b[0];
                     });
-                    genome_build();
+                    build_input_test();
                     // convert bed to string
                     let str = "";
                     bed.map(a => str += a.join("\t") + "\n");
@@ -881,7 +811,6 @@
         if (trace) {
             traces.push(trace)
         }
-        // console.log(traces)
 
         let layout = {
             height: aesthetics.height,
