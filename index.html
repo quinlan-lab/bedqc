@@ -355,7 +355,7 @@
             'beforeend',
             `<div class="container-fluid row pb-3">
                 <div class="d-flex col-1 justify-content-end"><code>Out[${idx}]</code></div>
-                <div class="col-lg-10 p-0">
+                <div class="col-lg-11 p-0">
                     <div class="d-flex flex-row">
                         <div class="pe-2">
                             <h6>${to_title(primary)} ${genome} ${secondary} count</h6>
@@ -484,7 +484,7 @@
                         <div class="col-1">
                             <div class="d-grid gap-2">
                                 <button type="button" class="btn btn-primary btn-floating position-relative hyp-test" id="hypothesis-select-action-${idx}">
-                                    Apply
+                                    Run
                                 </button>
                             </div>
                         </div>
@@ -508,7 +508,7 @@
             $(`#hypothesis-secondary-wrapper-${idx}`).prop("hidden", false)
         }
 
-        // 'apply' click
+        // 'Run' click
         document.getElementById(`hypothesis-select-action-${idx}`).addEventListener("click", run_hypothesis_action);
         // select input changes
         let elements = document.getElementsByClassName("form-select hyp-test");
@@ -543,7 +543,7 @@
                     'beforeend',
                     `<div class="container-fluid row pb-3">
                         <div class="d-flex col-1 justify-content-end"><code>Out[${idx}]</code></div>
-                        <div class="col-lg-10 p-0">
+                        <div class="col-lg-11 p-0">
                             <div class="d-flex flex-row">
                                 <div class="pe-2">
                                     <h6 id="interval-density-plot-title">Interval density across ${genome}</h6>
