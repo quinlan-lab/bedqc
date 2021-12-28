@@ -608,7 +608,8 @@
         } else if (primary == "Intersect") {
             $(`#hypothesis-secondary-wrapper-${idx}`).prop("hidden", false)
             if (secondary == "gap") {
-                str = `If your intervals are coding regions and intersect with many gaps across chromosomes, ${genome} may not be the underlying genome build of ${filename}.`
+                str = `If your intervals intersect with many gaps across chromosomes, ${genome} may not be the underlying genome build of ${filename}.`
+
             }
         }
         $(`#hypothesis-blurb-${idx}`).html(str)
