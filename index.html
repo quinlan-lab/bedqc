@@ -5,8 +5,9 @@
     <meta charset="utf-8" />
     <meta name="author" content="Joe Brown" />
     <title>.bed qc</title>
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces&display=swap" rel="stylesheet" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces&display=swap">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -76,7 +77,7 @@
         }
 
         .text-primary code {
-            color: rgba(var(--bs-primary-rgb),var(--bs-text-opacity)) !important
+            color: rgba(var(--bs-primary-rgb), var(--bs-text-opacity)) !important
         }
 
         .btn-floating {
@@ -107,6 +108,29 @@
                 </div>
             </label>
         </div>
+        <div class="col-lg-8 mx-auto px-2 py-5" id="introduction">
+            <p>
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean sit amet tortor erat. Etiam sed sapien
+                convallis, tempor lorem id, gravida erat. Mauris mattis dictum neque sed porta. Duis non nibh sapien.
+                Morbi fermentum lacinia tortor a bibendum. Suspendisse ipsum felis, hendrerit eget lacinia at, porta nec
+                est. Pellentesque quis finibus dui. Ut varius condimentum elementum. Sed vel arcu leo. Fusce ultrices at
+                diam in ullamcorper.
+            </p>
+            <p>
+                Aliquam at diam id risus tempor consequat eu eget est. Ut posuere tincidunt vestibulum. Mauris nec
+                turpis at massa euismod rutrum a ut lorem. Aliquam pharetra condimentum accumsan. Sed quis nibh quis mi
+                tristique tristique id a eros. Nulla egestas aliquam fermentum. Etiam ut aliquam mauris, et elementum
+                diam. Integer eu convallis sapien. Curabitur ante erat, lobortis ac dui sit amet, iaculis faucibus
+                magna. Proin a orci orci.
+            </p>
+            <p>
+                Link to the BED specification.
+            </p>
+            <p>
+                This tool makes use of the <a href="https://github.com/biowasm/aioli" class="link-dark">biowasm
+                    project</a>.
+            </p>
+        </div>
     </div>
 </nav>
 
@@ -130,6 +154,34 @@
             <div class="card-body">
                 <h3 class="card-subtitle mb-2 text-warning">Potential issue</h3>
                 <div class="card-img-top" id="interval-density-issue"></div>
+                <p class="card-text">Unequal distribution among chromosomes could mean
+                    a filter has been applied unevenly or possible file truncation.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvas-interval-counts"
+    aria-labelledby="offcanvas-interval-counts-label">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="offcanvas-interval-counts-label">Interpreting interval count plots</h5>
+        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+        <div class="row pb-3">
+            <div class="card-body">
+                <h3 class="card-subtitle mb-2 text-success">Normal</h3>
+                <div class="card-img-top" id="interval-counts-normal"></div>
+                <p class="card-text pt-2">Based on the known chromosome length and total interval count, the
+                    intervals are spread evenly among the chromosomes.
+                </p>
+            </div>
+        </div>
+        <div class="row pb-3">
+            <div class="card-body">
+                <h3 class="card-subtitle mb-2 text-warning">Potential issue</h3>
+                <div class="card-img-top" id="interval-counts-issue"></div>
                 <p class="card-text">Unequal distribution among chromosomes could mean
                     a filter has been applied unevenly or possible file truncation.
                 </p>
@@ -216,6 +268,8 @@
         }
     }
 
+    const sort_alphanum = (a, b) => a.localeCompare(b, 'en', { numeric: true })
+
     const build_example_plot = ({ x, o, e, divid, ytitle }) => {
         let traces = [{ x: x, y: o, type: "bar", marker: { color: aesthetics.palette[0], line: { color: 'black', width: 1 }, }, name: "Observed" }];
         if (e.length > 0) {
@@ -238,6 +292,22 @@
         o: [0.075, 0.13, 0.025],
         e: [0.08, 0.07, 0.06],
         divid: "interval-density-issue",
+        ytitle: "Density"
+    })
+
+    build_example_plot({
+        x: ["chr1", "chr2", "chr3"],
+        o: [100, 90, 80],
+        e: [95, 94, 78],
+        divid: "interval-counts-normal",
+        ytitle: "Density"
+    })
+
+    build_example_plot({
+        x: ["chr1", "chr2", "chr3"],
+        o: [100, 132, 18],
+        e: [95, 94, 78],
+        divid: "interval-counts-issue",
         ytitle: "Density"
     })
 
@@ -284,17 +354,22 @@
         return Promise.resolve()
     }
 
-    const add_table_row = ({ title, value, warn }) => {
+    const add_table_row = ({ title, value, warn, validation }) => {
         let divid = title.replace(" ", "-")
         let d = document.getElementById("metadata-table")
         let exists = document.getElementById(divid)
-        let text_color = warn ? "text-warn" : "text-primary"
+        let text_color = warn ? "text-danger" : "text-primary"
+        let validation_col = ""
+        if (validation) {
+            validation_col = warn ? `<td class="text-danger"><i class="bi bi-exclamation-triangle-fill"></i></td>` : `<td class="text-success"><i class="bi bi-check-circle-fill"></i></td>`
+        }
         if (!(exists)) {
             d.insertAdjacentHTML(
                 "beforeend",
                 `<tr>
                     <td>${title}</td>
                     <td id="${divid}" class="${text_color}"><pre>${value}</pre></td>
+                    ${validation_col}
                 </tr>`
             )
         } else {
@@ -330,12 +405,20 @@
         const element = document.getElementById(id);
         const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
 
-        window.scrollTo({top: y, behavior: 'smooth'});
+        window.scrollTo({ top: y, behavior: 'smooth' });
     }
 
-    const cli = async (track, chromosomes) => {
+    const bedtools_intersect = async (genome, track, chromosomes, prefix) => {
+        let remote_file = `bedqc.s3.amazonaws.com/${genome}_${track}.bed`
+        try {
+            await CLI.mount(`https://${remote_file}`)
+        } catch (error) {
+            console.log("file likely already exists. ignoring error.")
+            console.error(error);
+        }
+        // console.log("ls:", await CLI.ls("."));
         // intersect user upload and UCSC track
-        let o = await CLI.exec(`bedtools intersect -sorted -a a.bed -b b.bed`)
+        let o = await CLI.exec(`bedtools intersect -sorted -a a.bed -b ${remote_file.replace("/", "-")}`)
         o = o.split("\n").map(p => p.split("\t"))
 
         let chr_count = {}
@@ -347,9 +430,8 @@
         let idx = global_data.input_test_count;
         let primary = $(`#hypothesis-primary-${idx}`).val();
         let secondary = $(`#hypothesis-secondary-${idx}`).val();
-        let genome = $(`#hypothesis-genome-${idx}`).val();
 
-        console.log("offcanvas", primary, secondary)
+        genome = $(`#hypothesis-genome-${idx}`).val();
 
         d.insertAdjacentHTML(
             'beforeend',
@@ -379,47 +461,13 @@
             "Overlap count",
             `hypothesis-${idx}-plot`
         )
-        scroll_to(`hypothesis-${idx}-anchor`)
-
-        // create new test
-        build_input_test()
-    }
-
-    const bedtools_intersect = async (genome, track, chromosomes, prefix) => {
-        let ucsc_str = ""
-        jQuery.getJSON(`https://api.genome.ucsc.edu/getData/track?genome=${genome};track=${track}`, (track_data) => {
-            let selection = track_data[track]
-
-            let bed = [];
-            chromosomes.forEach(chr => {
-                selection[chr].forEach(idx => {
-                    if (![prefix]) {
-                        bed.push([idx.chrom.substring(3), idx.chromStart, idx.chromEnd])
-                    } else {
-                        bed.push([idx.chrom, idx.chromStart, idx.chromEnd])
-                    }
-                })
-            })
-            // sort -k1,1 -k2,2n
-            bed.sort(function (a, b) {
-                return a[1] > b[1];
-            });
-            bed.sort(function (a, b) {
-                return a[0] > b[0];
-            });
-            // toString...
-            let str = "";
-            bed.map(a => str += a.join("\t") + "\n");
-            CLI.fs.writeFile("b.bed", str);
-        }).then(async () => {
-            await cli(track, chromosomes)
-        })
-        return Promise.resolve()
     }
 
     const delimiter_string = (sep) => {
         if (sep == "\t") {
-            return "\\t"
+            return "tab"
+        } else if (sep == " ") {
+            return "space"
         } else {
             return sep
         }
@@ -459,7 +507,8 @@
                             <div class="form-floating">
                                 <select class="form-select hyp-test" id="hypothesis-primary-${idx}">
                                     <option selected>Calculate interval densities</option>
-                                    <option>Intersect</option>
+                                    <option>Calculate interval counts</option>
+                                    <option value="Intersect">Overlap intervals with track</option>
                                 </select>
                                 <label for="hypothesis-primary-${idx}">Action</label>
                             </div>
@@ -503,7 +552,7 @@
 
         update_hypothesis_blurb();
 
-        if (!(global_data.previous_input_action == "Calculate interval densities")) {
+        if (!(global_data.previous_input_action.startsWith("Calculate"))) {
             // show all selects
             $(`#hypothesis-secondary-wrapper-${idx}`).prop("hidden", false)
         }
@@ -528,6 +577,9 @@
         global_data.previous_input_action = action
         global_data.previous_genome = genome
 
+        // disable the components of the current test
+        $(".hyp-test:enabled").prop("disabled", true)
+
         if (action == "Calculate interval densities") {
             let chromosome_lengths;
             jQuery.getJSON(`https://api.genome.ucsc.edu/list/chromosomes?genome=${genome}`, (d) => {
@@ -546,7 +598,7 @@
                         <div class="col-lg-11 p-0">
                             <div class="d-flex flex-row">
                                 <div class="pe-2">
-                                    <h6 id="interval-density-plot-title">Interval density across ${genome}</h6>
+                                    <h6>Interval density across ${genome}</h6>
                                 </div>
                                 <a class="btn btn-primary btn-circle" data-bs-toggle="offcanvas" href="#offcanvas-interval-density" role="button" aria-controls="offcanvas-interval-density">?</a>
                             </div>
@@ -580,17 +632,70 @@
                         }
                     }
                 );
-                scroll_to(`hypothesis-${idx}-anchor`)
-                // create new test
+                build_input_test()
+            })
+        } else if (action == "Calculate interval counts") {
+            let chromosome_lengths;
+            jQuery.getJSON(`https://api.genome.ucsc.edu/list/chromosomes?genome=${genome}`, (d) => {
+                chromosome_lengths = d.chromosomes;
+                // adds non-chr prefixed chroms in addition to chr prefixed result
+                Object.keys(chromosome_lengths).map(k => chromosome_lengths[k.substring(3)] = chromosome_lengths[k]);
+            }).then(() => {
+                let genome_length = 0;
+                global_data.chromosomes.filter(x => x in chromosome_lengths).map(x => genome_length += chromosome_lengths[x]);
+
+                let d = document.getElementById("content")
+                d.insertAdjacentHTML(
+                    'beforeend',
+                    `<div class="container-fluid row pb-3">
+                        <div class="d-flex col-1 justify-content-end"><code>Out[${idx}]</code></div>
+                        <div class="col-lg-11 p-0">
+                            <div class="d-flex flex-row">
+                                <div class="pe-2">
+                                    <h6>Interval counts across ${genome}</h6>
+                                </div>
+                                <a class="btn btn-primary btn-circle" data-bs-toggle="offcanvas" href="#offcanvas-interval-counts" role="button" aria-controls="offcanvas-interval-counts">?</a>
+                            </div>
+                            <div class="row pt-1">
+                                <div class="col-12">
+                                    <div id="hypothesis-${idx}-plot"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    `
+                )
+
+                // only plot expected for chroms matched to UCSC
+                build_bar_plot(
+                    global_data.chromosomes,
+                    global_data.chromosomes.map(x => global_data.chr_interval_count[x]),
+                    "Chromosome",
+                    "Count",
+                    `hypothesis-${idx}-plot`,
+                    {
+                        x: global_data.chromosomes,
+                        y: global_data.chromosomes.map(y => global_data.interval_count_filtered * (chromosome_lengths[y] / genome_length)),
+                        type: "scatter",
+                        name: "Expected",
+                        mode: "markers",
+                        marker: {
+                            size: 12, symbol: "circle", color: "#f28e2c", line: {
+                                color: 'rgb(255,255,255)',
+                                width: 1
+                            },
+                        }
+                    }
+                );
                 build_input_test()
             })
         } else if (action == "Intersect") {
             await bedtools_intersect(genome, track, global_data.chromosomes, global_data.chr_prefix)
+            build_input_test()
         } else {
             console.log("Unaccounted for action selected.")
         }
-        // disable the components of the current test
-        $(".hyp-test:enabled").prop("disabled", true);
+        scroll_to(`hypothesis-${idx}-anchor`)
     }
 
     const update_hypothesis_blurb = (event) => {
@@ -601,7 +706,7 @@
         let genome = $(`#hypothesis-genome-${idx}`).val();
         let str = "";
 
-        if (primary == "Calculate interval densities") {
+        if (primary.startsWith("Calculate")) {
             str = `Select the genome build of ${filename}.`
             // hide the secondary select box
             $(`#hypothesis-secondary-wrapper-${idx}`).prop("hidden", true)
@@ -623,6 +728,7 @@
     };
 
     const file_upload = (event) => {
+        $("#introduction").prop("hidden", true)
         // clean up existing divs
         $("#content").empty();
 
@@ -670,7 +776,8 @@
             Papa.parse($('#file-upload').prop('files')[0], {
                 skipEmptyLines: true,
                 header: false,
-                delimiter: "\t",
+                // delimiter: "\t",
+                delimitersToGuess: ["\t", ",", " ", "|", ";", Papa.RECORD_SEP, Papa.UNIT_SEP],
                 step: (res, parser) => {
                     data.interval_count += 1;
 
@@ -678,13 +785,13 @@
                     if (!(res.meta.linebreak == "\n")) {
                         console.log("aborting due to bad line break")
                         data.newline = res.meta.linebreak
-                        parser.abort()
+                        // parser.abort()
                     }
                     // not tab delimited
                     if (!(res.meta.delimiter == "\t")) {
                         console.log("aborting due to bad delimiter")
                         data.delimiter = res.meta.delimiter
-                        parser.abort()
+                        // parser.abort()
                     }
                     // most likely a delimiter issue
                     if (res.data.length < 3) {
@@ -737,60 +844,65 @@
                     // show the file stats
                     $("#file-validation").prop("hidden", false)
                     if (!(data.delimiter == "\t")) {
-                        add_table_row({ title: "File delimiter", value: delimiter_string(data.delimiter), warn: true })
+                        add_table_row({ title: "File delimiter", value: delimiter_string(data.delimiter), warn: true, validation: true })
                     } else {
-                        add_table_row({ title: "File delimiter", value: delimiter_string(data.delimiter) })
+                        add_table_row({ title: "File delimiter", value: delimiter_string(data.delimiter), validation: true })
                     }
                     if (!(data.newline == "\n")) {
-                        add_table_row({ title: "File newline", value: newline_string(data.newline), warn: true })
+                        add_table_row({ title: "File newline", value: newline_string(data.newline), warn: true, validation: true })
                     } else {
-                        add_table_row({ title: "File newline", value: newline_string(data.newline) })
+                        add_table_row({ title: "File newline", value: newline_string(data.newline), validation: true })
                     }
                     if (!(data.missing_data == 0)) {
-                        add_table_row({ title: "Incomplete data on line", value: data.missing_data, warn: true })
+                        add_table_row({ title: "Incomplete data on line", value: data.missing_data, warn: true, validation: true })
                         return
-                    }
-                    if (data.newline == "\n" && data.delimiter == "\t") {
+                    } else {
+                        // < !--0 - length intervals-- >
+                        if (data.zero_length_intervals > 0) {
+                            add_table_row({ title: "0-length intervals", value: data.zero_length_intervals.toLocaleString(), warn: true, validation: true })
+                        } else {
+                            add_table_row({ title: "0-length intervals", value: data.zero_length_intervals.toLocaleString(), validation: true })
+                        }
                         // < !--number of fields per line-- >
                         add_table_row({ title: "BED fields", value: data.n_of_fields.join(",") })
                         // < !--interval count-- >
                         add_table_row({ title: "Total interval count", value: data.interval_count.toLocaleString() })
                         // < !--total nucleotides-- >
                         add_table_row({ title: "Total nucleotides", value: data.interval_length_total.toLocaleString() })
-                        // < !--0 - length intervals-- >
-                        add_table_row({ title: "0-length intervals", value: data.zero_length_intervals.toLocaleString() })
+                        // show the interval size dist
+                        add_plot_div('interval-size-dist', 'Interval size distribution', 5).then(() => {
+                            var trace = {
+                                x: data.interval_lengths,
+                                type: 'histogram',
+                                marker: { color: aesthetics.palette[0], },
+                            };
+                            let layout = {
+                                height: aesthetics.height,
+                                font: aesthetics.labelfont,
+                                padding: { t: 0, r: 0, },
+                                margin: { t: 0, r: 0, },
+                                xaxis: { title: "Interval length", automargin: true, },
+                                yaxis: { title: "Count", automargin: true, },
+                                legend: { font: { size: 16 } }
+                            };
+                            Plotly.newPlot('interval-size-dist-plot', [trace], layout, plot_config)
+                        })
+                        // sort by start, asc
+                        bed.sort(function (a, b) {
+                            return parseInt(a[1]) > parseInt(b[1]);
+                        });
+                        // sort by chrom, asc
+                        bed.sort(function (a, b) {
+                            return a[0] > b[0];
+                        });
+                        build_input_test();
+                        // convert bed to string
+                        let str = "";
+                        bed.map(a => str += a.join("\t") + "\n");
+                        CLI.fs.writeFile("a.bed", str);
+
+                        global_data.chromosomes.sort(sort_alphanum)
                     }
-                    // show the interval size dist
-                    add_plot_div('interval-size-dist', 'Interval size distribution', 5).then(() => {
-                        var trace = {
-                            x: data.interval_lengths,
-                            type: 'histogram',
-                            marker: { color: aesthetics.palette[0], },
-                        };
-                        let layout = {
-                            height: aesthetics.height,
-                            font: aesthetics.labelfont,
-                            padding: { t: 0, r: 0, },
-                            margin: { t: 0, r: 0, },
-                            xaxis: { title: "Interval length", automargin: true, },
-                            yaxis: { title: "Count", automargin: true, },
-                            legend: { font: { size: 16 } }
-                        };
-                        Plotly.newPlot('interval-size-dist-plot', [trace], layout, plot_config)
-                    })
-                    // sort by start, asc
-                    bed.sort(function (a, b) {
-                        return parseInt(a[1]) > parseInt(b[1]);
-                    });
-                    // sort by chrom, asc
-                    bed.sort(function (a, b) {
-                        return a[0] > b[0];
-                    });
-                    build_input_test();
-                    // convert bed to string
-                    let str = "";
-                    bed.map(a => str += a.join("\t") + "\n");
-                    CLI.fs.writeFile("a.bed", str);
                 }
             })
         }
