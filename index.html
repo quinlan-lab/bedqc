@@ -190,20 +190,30 @@
     </div>
 </div>
 
-<div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvas-Intersect-gap"
+<div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvas-Intersect"
     aria-labelledby="offcanvas-intersect-gap-label">
     <div class="offcanvas-header">
-        <h5 class="offcanvas-title" id="offcanvas-intersect-gap-label">Interpreting gap intersection plots</h5>
+        <h5 class="offcanvas-title" id="offcanvas-intersect-gap-label">Interpreting intersection plots</h5>
         <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
     <div class="offcanvas-body">
         <div class="row pb-3">
             <div class="card-body">
+                Intersecting a BED with known intervals can help us determine the genome by way of
+                elimination (using gaps). It can also instruct us whether or not our intervals hit
+                genes, exons, or introns, which can help sanity check intervals by genome build or
+                per your science question. For instance, if you assume your intervals are exonic
+                then one would expect zero hits with Ensembl introns.
+            </div>
+        </div>
+        <div class="row pb-3">
+            <div class="card-body">
                 <h3 class="card-subtitle mb-2 text-success">Normal</h3>
                 <div class="card-img-top" id="intersect-gap-normal"></div>
-                <p class="card-text pt-2">Our intervals (in this case) do not overlap the centromeres
-                    suggesting the selected genome build is <span class="fw-bold fst-italic">not
-                        incorrect</span>.
+                <p class="card-text pt-2">Our intervals, in the case of intersecting with Gaps, do
+                    not overlap structures like telemeres and centromeres of the selected genome
+                    build, suggesting the selected genome build is
+                    <span class="fw-bold fst-italic">not incorrect</span>.
                 </p>
             </div>
         </div>
@@ -211,8 +221,8 @@
             <div class="card-body">
                 <h3 class="card-subtitle mb-2 text-warning">Potential issue</h3>
                 <div class="card-img-top" id="intersect-gap-issue"></div>
-                <p class="card-text">In most cases, when we overlap our meaningful regions
-                    with known gaps we anticipate no centromere overlap.
+                <p class="card-text">If we intersect our intervals with Gaps and observe many overlaps, our intervals
+                    may not be from the selected genome build as we usually anticipate little overlap with centromeres.
                 </p>
             </div>
         </div>
@@ -409,9 +419,28 @@
     }
 
     const bedtools_intersect = async (genome, track, chromosomes, prefix) => {
-        let remote_file = `bedqc.s3.amazonaws.com/${genome}_${track}.bed`
+        let table;
+        let cmd = "bedtools intersect -sorted";
+        if (track == "gap") {
+            table = `${genome}_gap.bed.gz`
+        } else if (track.startsWith("Ensembl")) {
+            cmd += " -u"
+            if (track.endsWith("whole)")) {
+                table = `${genome}_ensembl_gene_wholegene.bed.gz`
+            } else if (track.endsWith("exon)")) {
+                table = `${genome}_ensembl_gene_exon.bed.gz`
+            } else if (track.endsWith("intron)")) {
+                table = `${genome}_ensembl_gene_intron.bed.gz`
+            } else if (track.endsWith("CDS)")) {
+                table = `${genome}_ensembl_gene_cds.bed.gz`
+            }
+        } else {
+            console.log("selected table was not accounted for in `bedtools intersect`")
+        }
+
+        let remote_file = `bedqc.s3.amazonaws.com/${table}`
         if (!(global_data.chr_prefix)) {
-            remote_file = `bedqc.s3.amazonaws.com/${genome}_${track}_noprefix.bed`
+            remote_file = remote_file.replace(".bed.gz", "_noprefix.bed.gz")
         }
         try {
             await CLI.mount(`https://${remote_file}`)
@@ -420,6 +449,7 @@
             console.error(error);
         }
         // console.log("ls:", await CLI.ls("."));
+
         // intersect user upload and UCSC track
         let o = await CLI.exec(`bedtools intersect -sorted -a a.bed -b ${remote_file.replace("/", "-")}`)
         o = o.split("\n").map(p => p.split("\t"))
@@ -445,7 +475,7 @@
                         <div class="pe-2">
                             <h6>${to_title(primary)} ${genome} ${secondary} count</h6>
                         </div>
-                        <a class="btn btn-primary btn-circle" data-bs-toggle="offcanvas" href="#offcanvas-${primary}-${secondary}" role="button" aria-controls="offcanvas-${primary}-${secondary}">?</a>
+                        <a class="btn btn-primary btn-circle" data-bs-toggle="offcanvas" href="#offcanvas-${primary}" role="button" aria-controls="offcanvas-${primary}">?</a>
                     </div>
                     <div class="row pt-1">
                         <div class="col-12">
@@ -492,8 +522,8 @@
         let genome = global_data.previous_genome
         let filename = $('#file-upload').prop('files')[0].name
         // defaults
-        let primary = global_data.previous_input_action
-        let secondary = "gap"
+        let primary = global_data.previous_primary_action
+        let secondary = global_data.previous_secondary_action
         let title = `${to_title(primary)} ${genome} ${secondary} count`
 
         let d = document.getElementById("content")
@@ -511,7 +541,7 @@
                                 <select class="form-select hyp-test" id="hypothesis-primary-${idx}">
                                     <option selected>Calculate interval densities</option>
                                     <option>Calculate interval counts</option>
-                                    <option value="Intersect">Overlap intervals with track</option>
+                                    <option value="Intersect">Overlap intervals with table</option>
                                 </select>
                                 <label for="hypothesis-primary-${idx}">Action</label>
                             </div>
@@ -529,6 +559,10 @@
                             <div class="form-floating">
                                 <select class="form-select hyp-test" id="hypothesis-secondary-${idx}">
                                     <option selected>gap</option>
+                                    <option>Ensembl gene (whole)</option>
+                                    <option>Ensembl gene (exon)</option>
+                                    <option>Ensembl gene (intron)</option>
+                                    <option>Ensembl gene (CDS)</option>
                                 </select>
                                 <label for="hypothesis-secondary-${idx}">Table</label>
                             </div>
@@ -550,12 +584,13 @@
             `
         )
 
-        $(`#hypothesis-primary-${idx}`).val(global_data.previous_input_action)
+        $(`#hypothesis-primary-${idx}`).val(global_data.previous_primary_action)
+        $(`#hypothesis-secondary-${idx}`).val(global_data.previous_secondary_action)
         $(`#hypothesis-genome-${idx}`).val(genome);
 
         update_hypothesis_blurb();
 
-        if (!(global_data.previous_input_action.startsWith("Calculate"))) {
+        if (!(global_data.previous_primary_action.startsWith("Calculate"))) {
             // show all selects
             $(`#hypothesis-secondary-wrapper-${idx}`).prop("hidden", false)
         }
@@ -572,16 +607,17 @@
     }
 
     const run_hypothesis_action = async () => {
-        let idx = global_data.input_test_count
+        let idx = global_data.input_test_count;
         let action = $(`#hypothesis-primary-${idx}`).val()
         let genome = $(`#hypothesis-genome-${idx}`).val();
         let track = $(`#hypothesis-secondary-${idx}`).val();
 
-        global_data.previous_input_action = action
-        global_data.previous_genome = genome
+        global_data.previous_primary_action = action;
+        global_data.previous_secondary_action = track;
+        global_data.previous_genome = genome;
 
         // disable the components of the current test
-        $(".hyp-test:enabled").prop("disabled", true)
+        $(".hyp-test:enabled").prop("disabled", true);
 
         if (action == "Calculate interval densities") {
             let chromosome_lengths;
@@ -717,7 +753,8 @@
             $(`#hypothesis-secondary-wrapper-${idx}`).prop("hidden", false)
             if (secondary == "gap") {
                 str = `If your intervals intersect with many gaps across chromosomes, ${genome} may not be the underlying genome build of ${filename}.`
-
+            } else {
+                str = `Intersect the intervals in ${filename} with Ensembl gene elements.`
             }
         }
         $(`#hypothesis-blurb-${idx}`).html(str)
@@ -771,7 +808,8 @@
             chr_interval_count: {},
             interval_count_filtered: 0,
             chr_prefix: true,
-            previous_input_action: "Calculate interval densities",
+            previous_primary_action: "Calculate interval densities",
+            previous_secondary_action: "gap",
             previous_genome: "hg38",
             chromosomes: []
         }
