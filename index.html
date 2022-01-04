@@ -410,6 +410,9 @@
 
     const bedtools_intersect = async (genome, track, chromosomes, prefix) => {
         let remote_file = `bedqc.s3.amazonaws.com/${genome}_${track}.bed`
+        if (!(global_data.chr_prefix)) {
+            remote_file = `bedqc.s3.amazonaws.com/${genome}_${track}_noprefix.bed`
+        }
         try {
             await CLI.mount(`https://${remote_file}`)
         } catch (error) {
@@ -588,7 +591,7 @@
                 Object.keys(chromosome_lengths).map(k => chromosome_lengths[k.substring(3)] = chromosome_lengths[k]);
             }).then(() => {
                 let genome_length = 0;
-                global_data.chromosomes.map(x => genome_length += chromosome_lengths[x]);
+                global_data.chromosomes.filter(x => x in chromosome_lengths).map(x => genome_length += chromosome_lengths[x]);
 
                 let d = document.getElementById("content")
                 d.insertAdjacentHTML(
