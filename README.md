@@ -15,3 +15,7 @@ artifacts. For instance, you can use this tool to help
 determine the genome build upon which your intervals are based
 using Gaps from various builds to find which has the fewest
 intersecting hits.
+
+[BED file specification](https://bedtools.readthedocs.io/en/latest/content/general-usage.html).
+
+This tool makes use of the [biowasm project](https://github.com/biowasm/aioli).
