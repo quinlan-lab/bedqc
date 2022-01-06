@@ -112,7 +112,6 @@
             <p>
                 A tool to profile BED formatted intervals (.bed).
             </p>
-
             <p>
                 BED QC will check your file against
                 <a href="https://bedtools.readthedocs.io/en/latest/content/general-usage.html#bed-format"
@@ -122,7 +121,6 @@
                 upon upload into your browser's memory. No data is
                 transferred from your local environment.
             </p>
-
             <p>
                 Once uploaded, you can choose to perform more complex tasks
                 on your BED file including calculating metrics based on the
@@ -131,6 +129,21 @@
                 determine the genome build upon which your intervals are based
                 using Gaps from various builds to find which has the fewest
                 intersecting hits.
+            </p>
+            <p>
+                Try BED QC with example data:
+            <ul>
+                <li>
+                    <button type="button" class="btn btn-link" id="load-example-cgpislands">
+                        CpG islands, GRCH38
+                    </button>
+                </li>
+                <li>
+                    <button type="button" class="btn btn-link" id="load-example-truncatedexons">
+                        Truncated file containing exons, GRCH38
+                    </button>
+                </li>
+            </ul>
             </p>
             <p>This tool utilizes the <a href="https://github.com/biowasm/aioli" class="link-dark">biowasm project</a>
                 to execute <a href="https://bedtools.readthedocs.io/en/latest/" class="link-dark">bedtools</a>
@@ -525,7 +538,6 @@
         global_data.input_test_count += 1
         let idx = global_data.input_test_count
         let genome = global_data.previous_genome
-        let filename = $('#file-upload').prop('files')[0].name
         // defaults
         let primary = global_data.previous_primary_action
         let secondary = global_data.previous_secondary_action
@@ -744,7 +756,7 @@
 
     const update_hypothesis_blurb = (event) => {
         let idx = global_data.input_test_count
-        let filename = $('#file-upload').prop('files')[0].name
+        let filename = (typeof global_data.file_obj === 'string' || global_data.file_obj instanceof String) ? global_data.file_obj.split(/[\\/]/).pop() : global_data.file_obj.name
         let primary = $(`#hypothesis-primary-${idx}`).val()
         let secondary = $(`#hypothesis-secondary-${idx}`).val()
         let genome = $(`#hypothesis-genome-${idx}`).val();
@@ -808,7 +820,19 @@
             chromosomes: [],
             all_chromosomes: []
         };
+
+        let file_obj = "";
+        // handle loading example data
+        if (event.type == "click") {
+            if (event.target.getAttribute('id') == "load-example-cgpislands") {
+                file_obj = "https://bedqc.s3.amazonaws.com/CpG_islands_GRCh38.bed"
+            } else if (event.target.getAttribute('id') == "load-example-truncatedexons") {
+                file_obj = "https://bedqc.s3.amazonaws.com/Truncated_exons_GRCh38.bed"
+            }
+        }
+
         global_data = {
+            file_obj: (event.type == "click") ? file_obj : $('#file-upload').prop('files')[0],
             input_test_count: 0,
             chr_interval_count: {},
             interval_count_filtered: 0,
@@ -818,8 +842,9 @@
             previous_genome: "hg38",
             chromosomes: []
         }
-        if ($('#file-upload').prop('files')[0]) {
-            Papa.parse($('#file-upload').prop('files')[0], {
+        if (global_data.file_obj) {
+            Papa.parse(global_data.file_obj, {
+                download: event.type == "click" ? true : false,
                 skipEmptyLines: true,
                 header: false,
                 // delimiter: "\t",
@@ -829,13 +854,13 @@
 
                     // incorrect line ending
                     if (!(res.meta.linebreak == "\n")) {
-                        console.log("aborting due to bad line break")
+                        console.log("found bad line break")
                         data.newline = res.meta.linebreak
                         // parser.abort()
                     }
                     // not tab delimited
                     if (!(res.meta.delimiter == "\t")) {
-                        console.log("aborting due to bad delimiter")
+                        console.log("found bad delimiter")
                         data.delimiter = res.meta.delimiter
                         // parser.abort()
                     }
@@ -1006,7 +1031,9 @@
     };
 
     $(document).ready(function () {
-        document.getElementById("file-upload").addEventListener('change', file_upload);
+        document.getElementById("file-upload").addEventListener("change", file_upload);
+        document.getElementById("load-example-cgpislands").addEventListener("click", file_upload);
+        document.getElementById("load-example-truncatedexons").addEventListener("click", file_upload);
     });
 </script>
 
