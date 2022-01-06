@@ -18,4 +18,5 @@ intersecting hits.
 
 [BED file specification](https://bedtools.readthedocs.io/en/latest/content/general-usage.html).
 
-This tool makes use of the [biowasm project](https://github.com/biowasm/aioli).
+This tool utilizes the [biowasm project](https://github.com/biowasm/aioli)
+to execute [bedtools](https://bedtools.readthedocs.io/en/latest/) in the browser.
