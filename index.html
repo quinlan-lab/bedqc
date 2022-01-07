@@ -484,14 +484,14 @@
             chr_count[row[0]] = (chr_count[row[0]] || 0) + 1;
         })
 
-        let d = document.getElementById("content");
+        let content = document.getElementById("content");
         let idx = global_data.input_test_count;
         let primary = $(`#hypothesis-primary-${idx}`).val();
         let secondary = $(`#hypothesis-secondary-${idx}`).val();
 
         genome = $(`#hypothesis-genome-${idx}`).val();
 
-        d.insertAdjacentHTML(
+        content.insertAdjacentHTML(
             'beforeend',
             `<div class="container-fluid row pb-3">
                 <div class="d-flex col-1 justify-content-end"><code>Out[${idx}]</code></div>
@@ -643,47 +643,54 @@
         // disable the components of the current test
         $(".hyp-test:enabled").prop("disabled", true);
 
-        if (action == "Calculate interval densities") {
-            let chromosome_lengths;
-            jQuery.getJSON(`https://api.genome.ucsc.edu/list/chromosomes?genome=${genome}`, (d) => {
+        let chromosome_lengths;
+        jQuery.getJSON(`https://api.genome.ucsc.edu/list/chromosomes?genome=${genome}`, (d) => {
+            if (global_data.chr_prefix) {
                 chromosome_lengths = d.chromosomes;
-                // adds non-chr prefixed chroms in addition to chr prefixed result
-                Object.keys(chromosome_lengths).map(k => chromosome_lengths[k.substring(3)] = chromosome_lengths[k]);
-            }).then(() => {
-                let genome_length = 0;
-                global_data.chromosomes.filter(x => x in chromosome_lengths).map(x => genome_length += chromosome_lengths[x]);
+            } else {
+                // non-chr prefixed chroms
+                Object.keys(d.chromosomes)
+                    .map(k => chromosome_lengths[k.substring(3)] = d.chromosomes[k]);
+            }
+        }).then(async () => {
+            let genome_length = 0;
+            let display_chroms = Object.keys(chromosome_lengths).filter(k => k.match(/fix|random|alt|Un|hap|MT|M/g) === null);
+            display_chroms.sort(sort_alphanum)
+            // length of genome with only primary chromosomes
+            display_chroms.map(x => genome_length += chromosome_lengths[x]);
+            let content = document.getElementById("content")
 
-                let d = document.getElementById("content")
-                d.insertAdjacentHTML(
+            if (action == "Calculate interval densities") {
+                content.insertAdjacentHTML(
                     'beforeend',
                     `<div class="container-fluid row pb-3">
-                        <div class="d-flex col-1 justify-content-end"><code>Out[${idx}]</code></div>
-                        <div class="col-lg-11 p-0">
-                            <div class="d-flex flex-row">
-                                <div class="pe-2">
-                                    <h6>Interval density across ${genome}</h6>
+                            <div class="d-flex col-1 justify-content-end"><code>Out[${idx}]</code></div>
+                            <div class="col-lg-11 p-0">
+                                <div class="d-flex flex-row">
+                                    <div class="pe-2">
+                                        <h6>Interval density across ${genome}</h6>
+                                    </div>
+                                    <a class="btn btn-primary btn-circle" data-bs-toggle="offcanvas" href="#offcanvas-interval-density" role="button" aria-controls="offcanvas-interval-density">?</a>
                                 </div>
-                                <a class="btn btn-primary btn-circle" data-bs-toggle="offcanvas" href="#offcanvas-interval-density" role="button" aria-controls="offcanvas-interval-density">?</a>
-                            </div>
-                            <div class="row pt-1">
-                                <div class="col-12">
-                                    <div id="hypothesis-${idx}-plot"></div>
+                                <div class="row pt-1">
+                                    <div class="col-12">
+                                        <div id="hypothesis-${idx}-plot"></div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    `
+                        `
                 )
 
                 build_bar_plot(
-                    global_data.chromosomes,
-                    global_data.chromosomes.map(x => global_data.chr_interval_count[x] / global_data.interval_count_filtered),
+                    display_chroms,
+                    display_chroms.map(k => global_data.chr_interval_count[k] / global_data.interval_count_filtered),
                     "Chromosome",
                     "Density",
                     `hypothesis-${idx}-plot`,
                     {
-                        x: global_data.chromosomes,
-                        y: global_data.chromosomes.map(x => (chromosome_lengths[x] / genome_length)),
+                        x: display_chroms,
+                        y: display_chroms.map(x => (chromosome_lengths[x] / genome_length)),
                         type: "scatter",
                         name: "Expected",
                         mode: "markers",
@@ -696,49 +703,37 @@
                     }
                 );
                 build_input_test()
-            })
-        } else if (action == "Calculate interval counts") {
-            let chromosome_lengths;
-            jQuery.getJSON(`https://api.genome.ucsc.edu/list/chromosomes?genome=${genome}`, (d) => {
-                chromosome_lengths = d.chromosomes;
-                // adds non-chr prefixed chroms in addition to chr prefixed result
-                Object.keys(chromosome_lengths).map(k => chromosome_lengths[k.substring(3)] = chromosome_lengths[k]);
-            }).then(() => {
-                let genome_length = 0;
-                global_data.chromosomes.filter(x => x in chromosome_lengths).map(x => genome_length += chromosome_lengths[x]);
-
-                let d = document.getElementById("content")
-                d.insertAdjacentHTML(
+            } else if (action == "Calculate interval counts") {
+                content.insertAdjacentHTML(
                     'beforeend',
                     `<div class="container-fluid row pb-3">
-                        <div class="d-flex col-1 justify-content-end"><code>Out[${idx}]</code></div>
-                        <div class="col-lg-11 p-0">
-                            <div class="d-flex flex-row">
-                                <div class="pe-2">
-                                    <h6>Interval counts across ${genome}</h6>
+                            <div class="d-flex col-1 justify-content-end"><code>Out[${idx}]</code></div>
+                            <div class="col-lg-11 p-0">
+                                <div class="d-flex flex-row">
+                                    <div class="pe-2">
+                                        <h6>Interval counts across ${genome}</h6>
+                                    </div>
+                                    <a class="btn btn-primary btn-circle" data-bs-toggle="offcanvas" href="#offcanvas-interval-counts" role="button" aria-controls="offcanvas-interval-counts">?</a>
                                 </div>
-                                <a class="btn btn-primary btn-circle" data-bs-toggle="offcanvas" href="#offcanvas-interval-counts" role="button" aria-controls="offcanvas-interval-counts">?</a>
-                            </div>
-                            <div class="row pt-1">
-                                <div class="col-12">
-                                    <div id="hypothesis-${idx}-plot"></div>
+                                <div class="row pt-1">
+                                    <div class="col-12">
+                                        <div id="hypothesis-${idx}-plot"></div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    `
+                        `
                 )
 
-                // only plot expected for chroms matched to UCSC
                 build_bar_plot(
-                    global_data.chromosomes,
-                    global_data.chromosomes.map(x => global_data.chr_interval_count[x]),
+                    display_chroms,
+                    display_chroms.map(k => global_data.chr_interval_count[k]),
                     "Chromosome",
                     "Count",
                     `hypothesis-${idx}-plot`,
                     {
-                        x: global_data.chromosomes,
-                        y: global_data.chromosomes.map(y => global_data.interval_count_filtered * (chromosome_lengths[y] / genome_length)),
+                        x: display_chroms,
+                        y: display_chroms.map(k => global_data.interval_count_filtered * (chromosome_lengths[k] / genome_length)),
                         type: "scatter",
                         name: "Expected",
                         mode: "markers",
@@ -751,14 +746,14 @@
                     }
                 );
                 build_input_test()
-            })
-        } else if (action == "Intersect") {
-            await bedtools_intersect(genome, track, global_data.chromosomes, global_data.chr_prefix)
-            build_input_test()
-        } else {
-            console.log("Unaccounted for action selected.")
-        }
-        scroll_to(`hypothesis-${idx}-anchor`)
+            } else if (action == "Intersect") {
+                await bedtools_intersect(genome, track, display_chroms, global_data.chr_prefix)
+                build_input_test()
+            } else {
+                console.log("Unaccounted for action selected.")
+            }
+            scroll_to(`hypothesis-${idx}-anchor`)
+        })
     }
 
     const update_hypothesis_blurb = (event) => {
@@ -897,7 +892,8 @@
                         data.all_chromosomes.push(chr)
                     }
 
-                    if (chr.match(/fix|random|alt|Un|hap/g) === null) {
+                    // only saving user data on primary chroms
+                    if (chr.match(/fix|random|alt|Un|hap|MT|M/g) === null) {
                         global_data.interval_count_filtered += 1;
                         bed.push(res.data.slice(0, 3))
                         // this eval is duplicated
