@@ -149,6 +149,13 @@
                 to execute <a href="https://bedtools.readthedocs.io/en/latest/" class="link-dark">bedtools</a>
                 in the browser.</p>
         </div>
+        <div class="col-lg-8 mx-auto px-2 py-5" id="example-loading" hidden>
+            <div class="d-flex justify-content-center">
+                <div class="spinner-border text-dark" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+        </div>
     </div>
 </nav>
 
@@ -824,6 +831,7 @@
         let file_obj = "";
         // handle loading example data
         if (event.type == "click") {
+            $("#example-loading").prop("hidden", false)
             if (event.target.getAttribute('id') == "load-example-cgpislands") {
                 file_obj = "https://bedqc.s3.amazonaws.com/CpG_islands_GRCh38.bed"
             } else if (event.target.getAttribute('id') == "load-example-truncatedexons") {
@@ -909,6 +917,7 @@
                     global_data.chr_interval_count[chr] = (global_data.chr_interval_count[chr] || 0) + 1;
                 },
                 complete: (res, file) => {
+                    $("#example-loading").prop("hidden", true)
                     // resize the upload area
                     let el = document.getElementById("file-upload")
                     // $(".form-control-lg::file-selector-button").attr("style", "min-height:")
