@@ -793,6 +793,7 @@
 
     const file_upload = (event) => {
         $("#introduction").prop("hidden", true)
+        $("#example-loading").prop("hidden", false)
         // clean up existing divs
         $("#content").empty();
 
@@ -831,7 +832,6 @@
         let file_obj = "";
         // handle loading example data
         if (event.type == "click") {
-            $("#example-loading").prop("hidden", false)
             if (event.target.getAttribute('id') == "load-example-cgpislands") {
                 file_obj = "https://bedqc.s3.amazonaws.com/CpG_islands_GRCh38.bed"
             } else if (event.target.getAttribute('id') == "load-example-truncatedexons") {
