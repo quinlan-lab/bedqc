@@ -28,7 +28,7 @@
 
         .brand {
             font-family: "Fraunces", serif;
-            font-size: 2.2rem;
+            font-size: 2.6rem;
             letter-spacing: -0.05em;
             color: #d91e30 !important;
         }
@@ -89,17 +89,18 @@
 
 <nav class="navbar">
     <div class="container-fluid row">
-        <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+        <!-- <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
             <a class="navbar-brand brand d-flex align-items-center mb-md-0 me-md-auto text-decoration-none"
-                href="https://github.com/quinlan-lab/bedqc">bedqc</a>
-        </div>
-        <div class="col-lg-8 mx-auto px-2">
-            <p>
-                <h3><b>bedqc</b> validates and profiles genomic intervals in BED format.</h3>
-            </p>
+                href="https://github.com/quinlan-lab/bedqc">bedqc</a> A tool to validate and profile genomic intervals in BED format.
+        </div> -->
+        <div class="col-lg-8 mx-auto px-2 pb-4">
+            <div class="py-4">
+                <span class="brand">bedqc</span>
+                <div class="lead">A tool to validate and profile genomic intervals in BED format.</div>
+            </div>
             <label for="file-upload" class="form-label w-100 m-0">
                 <div class="col-12 my-3">
-                    <h4>Upload your BED file here:</h4>
+                    <h3>Upload your BED file here:</h3>
                 </div>
             </label>
             <input class="form-control form-control-lg" type="file" id="file-upload">
@@ -111,70 +112,72 @@
                 </div>
             </label>
         </div>
-        <div class="col-lg-8 mx-auto px-2 py-5" id="introduction">
-            <p>
+        <div class="col-lg-8 mx-auto px-2" id="introduction">
+            <div class="py-3">
                 <h3>Try <b>bedqc</b> with example data:</h3>
-            <ul>
-                <li>
-                    <button type="button" class="btn btn-link" id="load-example-cgpislands">
-                        CpG islands, GRCh38
-                    </button>
-                </li>
-                <li>
-                    <button type="button" class="btn btn-link" id="load-example-truncatedexons">
-                        Truncated file containing exons, GRCh38
-                    </button>
-                </li>
-            </ul>
-            </p>
-            <p>
-                <h3><b>BED file validation</b></h3>
-            </p>
-            <p>Once you upload a file to <b>bedqc</b>, it will automatically  
-                compare your file to the <a href="https://samtools.github.io/hts-specs/BEDv1.pdf"
-                class="link-dark">BED specifications</a>, including 
-                checking the delimiter and line endings. No data is transferred from your local environment.
-                
-                <img src="img/valid.png" class="img-fluid" alt="results from a valid BED file">                
-            </p>
-            <br>
-            <p>
-                In addition, <b>bedqc</b> will compute and display an interval length distribution. 
-                <br>
-                <img src="img/sizes.png" class="img-fluid" alt="Interval size distribution">
-            </p>
+                <ul>
+                    <li>
+                        <button type="button" class="btn btn-link" id="load-example-cgpislands">
+                            CpG islands, GRCh38
+                        </button>
+                    </li>
+                    <li>
+                        <button type="button" class="btn btn-link" id="load-example-truncatedexons">
+                            Truncated file containing exons, GRCh38
+                        </button>
+                    </li>
+                </ul>
+            </div>
 
-            <p>
-                <h3><b>BED file analyses</b></h3>
-            </p>
-            <p>
-                Once a BED file is uploaded, you can choose to perform more complex tasks.
-                For example, you can look at the interval density by chromosome compared to 
-                what would be expected based on the relative length of each chromosome. In this
-                example of segmental duplications in the human genome, we see that chr17 has a much
-                higher density of segmental duplications than expected.
-                <br>
-                <img src="img/expected.png" class="img-fluid" alt="typical interval density">
-            </p>
+            <div class="py-3">
+                <h3>BED file validation</h3>
+                <p>Once you upload a file to <b>bedqc</b>, it will automatically
+                    compare your file to the <a href="https://samtools.github.io/hts-specs/BEDv1.pdf"
+                        class="link-dark">BED
+                        specifications</a>, including
+                    checking the delimiter and line endings. No data is transferred from your local environment.
 
-            <p>
-                We can also use this plot to diagnose truncated or incomplete files whether
-                intervals are solely observed for a subset of the chromosomes.
+                    <img src="img/valid.png" class="img-fluid p-4" alt="results from a valid BED file">
+                </p>
+                <p>
+                    In addition, <b>bedqc</b> will compute and display an interval length distribution.
+                    <br>
+                    <img src="img/sizes.png" class="img-fluid pt-4 pb-2" alt="Interval size distribution">
+                </p>
+            </div>
+
+            <div class="py-3">
+                <h3>BED file analyses</h3>
+                <p>
+                    Once a BED file is uploaded, you can choose to perform more complex tasks.
+                    For example, you can look at the interval density by chromosome compared to
+                    what would be expected based on the relative length of each chromosome. In this
+                    example of segmental duplications in the human genome, we see that chr17 has a much
+                    higher density of segmental duplications than expected.
+                    <br>
+                    <img src="img/expected.png" class="img-fluid p-4" alt="typical interval density">
+                </p>
+                <p>
+                    We can also use this plot to diagnose truncated or incomplete files whether
+                    intervals are solely observed for a subset of the chromosomes.
+                    <br>
+                    <img src="img/truncated.png" class="img-fluid p-4" alt="truncated interval density">
+                </p>
+                <p>
+                    Finally, one can use <b>bedqc</b> for other analyses by
+                    intersecting your BED file with various annotations. For
+                    instance, since most annotations will not overlap
+                    gaps in the same genome build, you can use this tool to help
+                    determine your file's genome build comparing to gaps from various
+                    builds to find which has the fewest intersecting hits.
+                </p>
                 <br>
-                <img src="img/truncated.png" class="img-fluid" alt="truncated interval density">
-            </p>
-            <p>
-                Finally, one can use <b>bedqc</b> for other analyses by 
-                intersecting your BED file with various annotations. For 
-                instance, since most annotations will not overlap 
-                gaps in the same genome build, you can use this tool to help
-                determine your file's genome build comparing to gaps from various 
-                builds to find which has the fewest intersecting hits.
-            </p>
-            <br>
-            <p>This tool utilizes the <a href="https://github.com/biowasm/aioli" class="link-dark">biowasm project</a>
-                to execute <a href="https://bedtools.readthedocs.io/en/latest/" class="link-dark">bedtools</a>
-                in the browser.</p>
+                <p>This tool utilizes the <a href="https://github.com/biowasm/aioli" class="link-dark">biowasm
+                        project</a>
+                    to execute <a href="https://bedtools.readthedocs.io/en/latest/" class="link-dark">bedtools</a>
+                    in the browser.
+                </p>
+            </div>
         </div>
         <div class="col-lg-8 mx-auto px-2 py-5" id="example-loading" hidden>
             <div class="d-flex justify-content-center">
