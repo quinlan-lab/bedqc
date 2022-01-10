@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="author" content="Joe Brown" />
-    <title>.bed qc</title>
+    <title>bedqc</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces&display=swap">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
@@ -23,12 +23,12 @@
         }
 
         footer {
-            min-height: 200px;
+            min-height: 100px;
         }
 
         .brand {
             font-family: "Fraunces", serif;
-            font-size: 2.6rem;
+            font-size: 3.0rem;
             letter-spacing: -0.05em;
             color: #d91e30 !important;
         }
@@ -38,7 +38,7 @@
         }
 
         .form-control-lg::file-selector-button {
-            min-height: 100px;
+            min-height: 120px;
         }
 
         label {
@@ -84,109 +84,126 @@
             line-height: 1.95;
             font-size: 1.4rem;
         }
+
+        .feature-icon {
+            font-size: 3rem;
+        }
     </style>
 </head>
 
-<nav class="navbar">
-    <div class="container-fluid row">
-        <!-- <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
-            <a class="navbar-brand brand d-flex align-items-center mb-md-0 me-md-auto text-decoration-none"
-                href="https://github.com/quinlan-lab/bedqc">bedqc</a> A tool to validate and profile genomic intervals in BED format.
-        </div> -->
-        <div class="col-lg-8 mx-auto px-2 pb-4">
-            <div class="py-4">
-                <span class="brand">bedqc</span>
-                <div class="lead">A tool to validate and profile genomic intervals in BED format.</div>
-            </div>
-            <label for="file-upload" class="form-label w-100 m-0">
-                <div class="col-12 my-3">
-                    <h3>Upload your BED file here:</h3>
-                </div>
-            </label>
+<nav>
+    <div class="px-4 py-5 my-5 text-center">
+        <h1 class="display-5 fw-bold brand">bedqc</h1>
+        <div class="col-lg-6 mx-auto">
+            <p class="lead mb-4">A tool to locally validate and profile genomic intervals in BED format.</p>
+        </div>
+        <div class="col-12 col-lg-6 mx-auto">
             <input class="form-control form-control-lg" type="file" id="file-upload">
-            <label for="file-upload" class="form-label w-100">
-                <div class="row">
-                    <div class="col-12 py-2 text-secondary">
-                        Your files and data are never transferred over the internet.
+        </div>
+    </div>
+
+    <div id="introduction">
+        <div class="container px-4 py-5">
+            <!-- <h2 class="pb-2 border-bottom">Hanging icons</h2> -->
+            <div class="row g-4 py-5 row-cols-1 row-cols-lg-3">
+                <div class="col d-flex align-items-start">
+                    <div class="icon-square text-dark flex-shrink-0 me-3">
+                        <i class="bi bi-lock feature-icon"></i>
+                    </div>
+                    <div>
+                        <h2>Secure processing</h2>
+                        <p>Your files are processed by your browser on your local machine using javascript and tools
+                            from
+                            the <a href="https://github.com/biowasm/aioli" class="link-dark">biowasm project</a>. No
+                            data is
+                            transferred from your local machine.</p>
                     </div>
                 </div>
-            </label>
+                <div class="col d-flex align-items-start">
+                    <div class="icon-square text-dark flex-shrink-0 me-3">
+                        <i class="bi bi-check2-all feature-icon"></i>
+                    </div>
+                    <div>
+                        <h2>BED validation</h2>
+                        <p>Your file is validated against
+                            <a href="https://samtools.github.io/hts-specs/BEDv1.pdf" class="link-dark">BEDv1 file
+                                specifications</a>.
+                            Common issues with file delimiter, newline character, and 0-length intervals are reported
+                            after
+                            upload.
+                        </p>
+                    </div>
+                </div>
+                <div class="col d-flex align-items-start">
+                    <div class="icon-square text-dark flex-shrink-0 me-3">
+                        <i class="bi bi-bar-chart-line feature-icon"></i>
+                    </div>
+                    <div>
+                        <h2>Try an example</h2>
+                        <p>We have prepared two examples to discover bedqc features</p>
+                        <ul>
+                            <li>
+                                <button type="button" class="btn btn-link" id="load-example-cgpislands">CpG islands,
+                                    GRCh38
+                                </button>
+                            </li>
+                            <li>
+                                <button type="button" class="btn btn-link" id="load-example-truncatedexons">Truncated
+                                    file,
+                                    GRCh38</button>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="col-lg-8 mx-auto px-2" id="introduction">
-            <div class="py-3">
-                <h3>Try <b>bedqc</b> with example data:</h3>
-                <ul>
-                    <li>
-                        <button type="button" class="btn btn-link" id="load-example-cgpislands">
-                            CpG islands, GRCh38
-                        </button>
-                    </li>
-                    <li>
-                        <button type="button" class="btn btn-link" id="load-example-truncatedexons">
-                            Truncated file containing exons, GRCh38
-                        </button>
-                    </li>
-                </ul>
+        <div class="container col-xxl-10 px-4 py-5">
+            <div class="row flex-lg-row-reverse align-items-center g-5 py-5">
+                <div class="col-10 col-sm-12 col-lg-8">
+                    <img src="img/expected.png" class="d-block mx-lg-auto img-fluid" alt="typical interval density"
+                        width="900" height="700" loading="lazy">
+                </div>
+                <div class="col-lg-4">
+                    <h1 class="display-5 fw-bold lh-1 mb-3">Check interval density by chromosome</h1>
+                    <p class="lead">You can look at the interval density or count by chromosome compared to
+                        what would be expected based on the relative length of each chromosome. For example, segmental
+                        duplications have a much higher density than expected on chr16 in the human genome.</p>
+                </div>
             </div>
-
-            <div class="py-3">
-                <h3>BED file validation</h3>
-                <p>Once you upload a file to <b>bedqc</b>, it will automatically
-                    compare your file to the <a href="https://samtools.github.io/hts-specs/BEDv1.pdf"
-                        class="link-dark">BED
-                        specifications</a>, including
-                    checking the delimiter and line endings. No data is transferred from your local environment.
-
-                    <img src="img/valid.png" class="img-fluid p-4" alt="results from a valid BED file">
-                </p>
-                <p>
-                    In addition, <b>bedqc</b> will compute and display an interval length distribution.
-                    <br>
-                    <img src="img/sizes.png" class="img-fluid pt-4 pb-2" alt="Interval size distribution">
-                </p>
+        </div>
+        <div class="container col-xxl-10 px-4 py-5">
+            <div class="row flex-lg-row-reverse align-items-center g-5 py-5">
+                <div class="col-lg-4">
+                    <h1 class="display-5 fw-bold lh-1 mb-3">Find truncated files</h1>
+                    <p class="lead">Use interval counts plot to diagnose truncated or incomplete files based on the
+                        expected
+                        chromosomes of a genome build.</p>
+                </div>
+                <div class="col-10 col-sm-12 col-lg-8">
+                    <img src="img/truncated.png" class="d-block mx-lg-auto img-fluid" alt="typical interval density"
+                        width="900" height="700" loading="lazy">
+                </div>
             </div>
-
-            <div class="py-3">
-                <h3>BED file analyses</h3>
-                <p>
-                    Once a BED file is uploaded, you can choose to perform more complex tasks.
-                    For example, you can look at the interval density by chromosome compared to
-                    what would be expected based on the relative length of each chromosome. In this
-                    example of segmental duplications in the human genome, we see that chr17 has a much
-                    higher density of segmental duplications than expected.
-                    <br>
-                    <img src="img/expected.png" class="img-fluid p-4" alt="typical interval density">
-                </p>
-                <p>
-                    We can also use this plot to diagnose truncated or incomplete files whether
-                    intervals are solely observed for a subset of the chromosomes.
-                    <br>
-                    <img src="img/truncated.png" class="img-fluid p-4" alt="truncated interval density">
-                </p>
-                <p>
-                    Finally, one can use <b>bedqc</b> for other analyses by
-                    intersecting your BED file with various annotations. For
-                    instance, since most annotations will not overlap
+        </div>
+        <div class="px-4 py-5 my-5 text-center">
+            <h1 class="display-5 fw-bold">More complex analyses</h1>
+            <div class="col-lg-6 mx-auto">
+                <p class="lead mb-4">For instance, since most annotations will not overlap
                     gaps in the same genome build, you can use this tool to help
                     determine your file's genome build comparing to gaps from various
-                    builds to find which has the fewest intersecting hits.
-                </p>
-                <br>
-                <p>This tool utilizes the <a href="https://github.com/biowasm/aioli" class="link-dark">biowasm
-                        project</a>
-                    to execute <a href="https://bedtools.readthedocs.io/en/latest/" class="link-dark">bedtools</a>
-                    in the browser.
-                </p>
-            </div>
-        </div>
-        <div class="col-lg-8 mx-auto px-2 py-5" id="example-loading" hidden>
-            <div class="d-flex justify-content-center">
-                <div class="spinner-border text-dark" role="status">
-                    <span class="visually-hidden">Loading...</span>
-                </div>
+                    builds to find which has the fewest intersecting hits.</p>
             </div>
         </div>
     </div>
+
+    <div class="col-lg-8 mx-auto px-2 py-5" id="example-loading" hidden>
+        <div class="d-flex justify-content-center">
+            <div class="spinner-border text-dark" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    </div>
+
 </nav>
 
 <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvas-interval-density"
@@ -288,13 +305,12 @@
 </main>
 
 <div class="container">
-    <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4">
+    <footer class="d-flex flex-wrap justify-content-between align-items-center">
         <div class="col-md-4 d-flex align-items-center">
             <!-- <a class="navbar-brand brand d-flex align-items-center mb-md-0 me-md-auto text-decoration-none" -->
-            <!-- href="https://github.com/quinlan-lab/bedqc">.bed qc</a> -->
+            <!-- href="https://github.com/quinlan-lab/bedqc">bedqc</a> -->
             <!-- <span class="text-muted">&copy; 2021</span> -->
         </div>
-
         <!-- <ul class="nav col-md-4 justify-content-end list-unstyled d-flex"> -->
         <!-- <li class="ms-3"><a class="text-muted" href="https://github.com/quinlan-lab/bedqc"><svg -->
         <!-- xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" -->
@@ -880,7 +896,6 @@
                 download: event.type == "click" ? true : false,
                 skipEmptyLines: true,
                 header: false,
-                // delimiter: "\t",
                 delimitersToGuess: ["\t", ",", " ", "|", ";", Papa.RECORD_SEP, Papa.UNIT_SEP],
                 step: (res, parser) => {
                     data.interval_count += 1;
