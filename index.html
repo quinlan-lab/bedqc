@@ -494,7 +494,7 @@
 
     const bedtools_intersect = async (genome, track, chromosomes, prefix) => {
         let table;
-        let cmd = "bedtools intersect -sorted";
+        let cmd = "bedtools intersect";
         if (track == "gap") {
             table = `${genome}_gap.bed.gz`
         } else if (track.startsWith("Ensembl")) {
@@ -525,7 +525,7 @@
         // console.log("ls:", await CLI.ls("."));
 
         // intersect user upload and UCSC track
-        let o = await CLI.exec(`bedtools intersect -sorted -a a.bed -b ${remote_file.replace("/", "-")}`)
+        let o = await CLI.exec(`${cmd} -a a.bed -b ${remote_file.replace("/", "-")}`)
         o = o.split("\n").map(p => p.split("\t"))
 
         let chr_count = {}
@@ -960,7 +960,7 @@
                     data.chr_interval_length[chr] = (data.chr_interval_length[chr] || 0) + current_length;
                     global_data.chr_interval_count[chr] = (global_data.chr_interval_count[chr] || 0) + 1;
                 },
-                complete: (res, file) => {
+                complete: async (res, file) => {
                     $("#example-loading").prop("hidden", true)
                     // resize the upload area
                     let el = document.getElementById("file-upload")
@@ -1012,19 +1012,14 @@
                             Plotly.newPlot('interval-size-dist-plot', [trace], layout, plot_config)
                         })
                         // sort by start, asc
-                        bed.sort(function (a, b) {
-                            return parseInt(a[1]) > parseInt(b[1]);
-                        });
+                        bed.sort((a,b) => parseInt(a[1]) > parseInt(b[1]) ? 1 : -1);
                         // sort by chrom, asc
-                        bed.sort(function (a, b) {
-                            return a[0] > b[0];
-                        });
+                        bed.sort((a, b) => a[0] > b[0] ? 1 : -1);
                         build_input_test();
                         // convert bed to string
                         let str = "";
                         bed.map(a => str += a.join("\t") + "\n");
-                        CLI.fs.writeFile("a.bed", str);
-
+                        await CLI.fs.writeFile("a.bed", str);
                         global_data.chromosomes.sort(sort_alphanum)
                     }
                 }
