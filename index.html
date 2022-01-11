@@ -494,7 +494,7 @@
 
     const bedtools_intersect = async (genome, track, chromosomes, prefix) => {
         let table;
-        let cmd = "bedtools intersect";
+        let cmd = "bedtools intersect -sorted";
         if (track == "gap") {
             table = `${genome}_gap.bed.gz`
         } else if (track.startsWith("Ensembl")) {
@@ -1011,8 +1011,10 @@
                             };
                             Plotly.newPlot('interval-size-dist-plot', [trace], layout, plot_config)
                         })
+
+                        // bed.sort((a,b) => parseInt(a[2]) > parseInt(b[2]) ? -1 : 1);
                         // sort by start, asc
-                        bed.sort((a,b) => parseInt(a[1]) > parseInt(b[1]) ? 1 : -1);
+                        bed.sort((a,b) => parseInt(a[1]) > parseInt(b[1]) ? -1 : 1);
                         // sort by chrom, asc
                         bed.sort((a, b) => a[0] > b[0] ? 1 : -1);
                         build_input_test();
