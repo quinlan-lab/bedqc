@@ -100,6 +100,7 @@
         <div class="col-12 col-lg-6 mx-auto">
             <input class="form-control form-control-lg" type="file" id="file-upload">
         </div>
+        <div class="col-lg-6 mx-auto text-danger pt-2" id="file-size-warning" hidden></div>
     </div>
 
     <div id="introduction">
@@ -840,6 +841,7 @@
     const file_upload = (event) => {
         $("#introduction").prop("hidden", true)
         $("#example-loading").prop("hidden", false)
+        $("#file-size-warning").prop("hidden", true)
         // clean up existing divs
         $("#content").empty();
 
@@ -883,10 +885,19 @@
             } else if (event.target.getAttribute('id') == "load-example-truncatedexons") {
                 file_obj = "https://bedqc.s3.amazonaws.com/Truncated_exons_GRCh38.bed"
             }
+        } else {
+            file_obj = $('#file-upload').prop('files')[0]
+            if (file_obj.size > 104857600) {
+                $("#file-size-warning").prop("hidden", false)
+                $("#file-size-warning").html(`File size was larger than our recommended limit of 100MB [${(file_obj.size / 1024 / 1024).toFixed(2)} MB]`)
+                $("#introduction").prop("hidden", false)
+                $("#example-loading").prop("hidden", true)
+                return
+            }
         }
 
         global_data = {
-            file_obj: (event.type == "click") ? file_obj : $('#file-upload').prop('files')[0],
+            file_obj: file_obj,
             input_test_count: 0,
             chr_interval_count: {},
             interval_count_filtered: 0,
@@ -896,6 +907,7 @@
             previous_genome: "hg38",
             chromosomes: []
         }
+
         if (global_data.file_obj) {
             Papa.parse(global_data.file_obj, {
                 download: event.type == "click" ? true : false,
