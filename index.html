@@ -461,9 +461,9 @@
         }
     }
 
-    let CLI = await new Aioli("bedtools/2.29.2");
+    let CLI = await new Aioli("bedtools/2.29.2", { printInterleaved: false});
     const output = await CLI.exec("bedtools --version");
-    console.log(`Loaded ${output}`);
+    console.log(`Loaded ${output.stdout}`);
 
     const strip_prefix = (str) => {
         if (str.startsWith("chr")) {
@@ -526,10 +526,10 @@
 
         // intersect user upload and UCSC track
         let o = await CLI.exec(`${cmd} -a a.bed -b ${remote_file.replace("/", "-")}`)
-        o = o.split("\n").map(p => p.split("\t"))
+        o.stdout = o.stdout.split("\n").map(p => p.split("\t"))
 
         let chr_count = {}
-        o.forEach(row => {
+        o.stdout.forEach(row => {
             chr_count[row[0]] = (chr_count[row[0]] || 0) + 1;
         })
 
@@ -539,6 +539,7 @@
         let secondary = $(`#hypothesis-secondary-${idx}`).val();
 
         genome = $(`#hypothesis-genome-${idx}`).val();
+        let err_msg = o.stderr ? `<div class="col-12 pb-2"><div><code>${o.stderr}</code></div></div>` : ""
 
         content.insertAdjacentHTML(
             'beforeend',
@@ -552,6 +553,7 @@
                         <a class="btn btn-primary btn-circle" data-bs-toggle="offcanvas" href="#offcanvas-${primary}" role="button" aria-controls="offcanvas-${primary}">?</a>
                     </div>
                     <div class="row pt-1">
+                        ${err_msg}
                         <div class="col-12">
                             <div id="hypothesis-${idx}-plot"></div>
                         </div>
@@ -929,7 +931,10 @@
                         data.n_of_fields.push(res.data.length)
                     }
 
-                    let chr = res.data[0];
+                    let chr = res.data[0].toLowerCase();
+                    //
+                    res.data[1] = parseInt(res.data[1])
+                    res.data[2] = parseInt(res.data[2])
                     let current_length = res.data[2] - res.data[1];
                     if (!(chr.startsWith('chr'))) {
                         global_data.chr_prefix = false
@@ -1012,11 +1017,10 @@
                             Plotly.newPlot('interval-size-dist-plot', [trace], layout, plot_config)
                         })
 
-                        // bed.sort((a,b) => parseInt(a[2]) > parseInt(b[2]) ? -1 : 1);
                         // sort by start, asc
-                        bed.sort((a,b) => parseInt(a[1]) > parseInt(b[1]) ? -1 : 1);
+                        bed.sort((a, b) => (a[1] > b[1]) ? 1 : ((a[1] < b[1]) ? -1 : 0))
                         // sort by chrom, asc
-                        bed.sort((a, b) => a[0] > b[0] ? 1 : -1);
+                        bed.sort((a, b) => (a[0] > b[0]) ? 1 : ((a[0] < b[0]) ? -1 : 0))
                         build_input_test();
                         // convert bed to string
                         let str = "";
