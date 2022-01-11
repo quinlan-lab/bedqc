@@ -945,6 +945,12 @@
                         data.all_chromosomes.push(chr)
                     }
 
+                    // malformatted entry; 0-based start, 1-based end
+                    if (current_length == 0) {
+                        data.zero_length_intervals += 1;
+                        res.data[1] -= 1
+                    }
+
                     // only saving user data on primary chroms
                     if (chr.match(/fix|random|alt|Un|hap|MT|M/g) === null) {
                         global_data.interval_count_filtered += 1;
@@ -953,11 +959,6 @@
                         if (!(chr in data.chr_interval_length)) {
                             global_data.chromosomes.push(chr);
                         }
-                    }
-
-                    // malformatted entry; 0-based start, 1-based end
-                    if (current_length == 0) {
-                        data.zero_length_intervals += 1;
                     }
 
                     data.interval_length_total += current_length;
