@@ -5,9 +5,9 @@
     <meta charset="utf-8" />
     <meta name="author" content="Joe Brown" />
     <title>bedqc</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces&display=swap">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces&display=swap" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" />
     <link rel="stylesheet" href="https://cdn.datatables.net/v/bs5/dt-1.11.3/fh-3.2.1/datatables.min.css" />
     <!-- <link rel="stylesheet" href="https://cdn.datatables.net/1.11.3/css/dataTables.bootstrap5.min.css"/> -->
 
@@ -32,7 +32,7 @@
 
         .brand {
             font-family: "Fraunces", serif;
-            font-size: 3.0rem;
+            font-size: 3rem;
             letter-spacing: -0.05em;
             color: #d91e30 !important;
         }
@@ -86,7 +86,7 @@
         }
 
         .text-primary code {
-            color: rgba(var(--bs-primary-rgb), var(--bs-text-opacity)) !important
+            color: rgba(var(--bs-primary-rgb), var(--bs-text-opacity)) !important;
         }
 
         .btn-floating {
@@ -104,10 +104,10 @@
     <div class="px-4 py-5 my-5 text-center">
         <h1 class="display-5 fw-bold brand">bedqc</h1>
         <div class="col-lg-6 mx-auto">
-            <p class="lead mb-4">A tool to locally validate and profile genomic intervals in BED format.</p>
+            <p class="lead mb-4">A tool to validate and profile genomic intervals in BED format.</p>
         </div>
         <div class="col-12 col-lg-6 mx-auto">
-            <input class="form-control form-control-lg" type="file" id="file-upload">
+            <input class="form-control form-control-lg" type="file" id="file-upload" />
         </div>
         <div class="col-lg-6 mx-auto text-danger pt-2" id="file-size-warning" hidden></div>
     </div>
@@ -123,10 +123,8 @@
                     <div>
                         <h2>Secure processing</h2>
                         <p>Your files are processed by your browser on your local machine using javascript and tools
-                            from
-                            the <a href="https://github.com/biowasm/aioli" class="link-dark">biowasm project</a>. No
-                            data is
-                            transferred from your local machine.</p>
+                            from the <a href="https://github.com/biowasm/aioli" class="link-dark">biowasm project</a>.
+                            No data is transferred from your local machine.</p>
                     </div>
                 </div>
                 <div class="col d-flex align-items-start">
@@ -135,13 +133,9 @@
                     </div>
                     <div>
                         <h2>BED validation</h2>
-                        <p>Your file is validated against
-                            <a href="https://samtools.github.io/hts-specs/BEDv1.pdf" class="link-dark">BEDv1 file
-                                specifications</a>.
-                            Common issues with file delimiter, newline character, and 0-length intervals are reported
-                            after
-                            upload.
-                        </p>
+                        <p>Your file is validated against <a href="https://samtools.github.io/hts-specs/BEDv1.pdf"
+                                class="link-dark">BEDv1 file specifications</a>. Common issues with file delimiter,
+                            newline character, and 0-length intervals are reported after upload.</p>
                     </div>
                 </div>
                 <div class="col d-flex align-items-start">
@@ -154,13 +148,11 @@
                         <ul>
                             <li>
                                 <button type="button" class="btn btn-link" id="load-example-cgpislands">CpG islands,
-                                    GRCh38
-                                </button>
+                                    GRCh38</button>
                             </li>
                             <li>
                                 <button type="button" class="btn btn-link" id="load-example-truncatedexons">Truncated
-                                    file,
-                                    GRCh38</button>
+                                    file, GRCh38</button>
                             </li>
                         </ul>
                     </div>
@@ -174,13 +166,13 @@
             <div class="row flex-lg-row-reverse align-items-center g-5 py-5">
                 <div class="col-10 col-sm-12 col-lg-8">
                     <img src="img/expected.png" class="d-block mx-lg-auto img-fluid" alt="typical interval density"
-                        width="900" height="700" loading="lazy">
+                        width="900" height="700" loading="lazy" />
                 </div>
                 <div class="col-lg-4">
                     <h1 class="display-5 fw-bold lh-1 mb-3">Check interval density by chromosome</h1>
-                    <p class="lead">You can look at the interval density or count by chromosome compared to
-                        what would be expected based on the relative length of each chromosome. For example, segmental
-                        duplications have a much higher density than expected on chr16 in the human genome.</p>
+                    <p class="lead">You can look at the interval density or count by chromosome compared to what would
+                        be expected based on the relative length of each chromosome. For example, segmental duplications
+                        have a much higher density than expected on chr16 in the human genome.</p>
                 </div>
             </div>
         </div>
@@ -189,22 +181,20 @@
                 <div class="col-lg-4">
                     <h1 class="display-5 fw-bold lh-1 mb-3">Find truncated files</h1>
                     <p class="lead">Use interval counts plot to diagnose truncated or incomplete files based on the
-                        expected
-                        chromosomes of a genome build.</p>
+                        expected chromosomes of a genome build.</p>
                 </div>
                 <div class="col-10 col-sm-12 col-lg-8">
                     <img src="img/truncated.png" class="d-block mx-lg-auto img-fluid" alt="typical interval density"
-                        width="900" height="700" loading="lazy">
+                        width="900" height="700" loading="lazy" />
                 </div>
             </div>
         </div>
         <div class="px-4 py-5 my-5 text-center">
             <h1 class="display-5 fw-bold">More complex analyses</h1>
             <div class="col-lg-6 mx-auto">
-                <p class="lead mb-4">For instance, since most annotations will not overlap
-                    gaps in the same genome build, you can use this tool to help
-                    determine your file's genome build comparing to gaps from various
-                    builds to find which has the fewest intersecting hits.</p>
+                <p class="lead mb-4">For instance, since most annotations will not overlap gaps in the same genome
+                    build, you can use this tool to help determine your file's genome build comparing to gaps from
+                    various builds to find which has the fewest intersecting hits.</p>
             </div>
         </div>
     </div>
@@ -216,7 +206,6 @@
             </div>
         </div>
     </div>
-
 </nav>
 
 <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvas-interval-density"
@@ -230,18 +219,16 @@
             <div class="card-body">
                 <h3 class="card-subtitle mb-2 text-success">Normal</h3>
                 <div class="card-img-top" id="interval-density-normal"></div>
-                <p class="card-text pt-2">Based on the known chromosome length and total interval count, the
-                    intervals are spread evenly among the chromosomes.
-                </p>
+                <p class="card-text pt-2">Based on the known chromosome length and total interval count, the intervals
+                    are spread evenly among the chromosomes.</p>
             </div>
         </div>
         <div class="row pb-3">
             <div class="card-body">
                 <h3 class="card-subtitle mb-2 text-warning">Potential issue</h3>
                 <div class="card-img-top" id="interval-density-issue"></div>
-                <p class="card-text">Unequal distribution among chromosomes could mean
-                    a filter has been applied unevenly or possible file truncation.
-                </p>
+                <p class="card-text">Unequal distribution among chromosomes could mean a filter has been applied
+                    unevenly or possible file truncation.</p>
             </div>
         </div>
     </div>
@@ -258,18 +245,16 @@
             <div class="card-body">
                 <h3 class="card-subtitle mb-2 text-success">Normal</h3>
                 <div class="card-img-top" id="interval-counts-normal"></div>
-                <p class="card-text pt-2">Based on the known chromosome length and total interval count, the
-                    intervals are spread evenly among the chromosomes.
-                </p>
+                <p class="card-text pt-2">Based on the known chromosome length and total interval count, the intervals
+                    are spread evenly among the chromosomes.</p>
             </div>
         </div>
         <div class="row pb-3">
             <div class="card-body">
                 <h3 class="card-subtitle mb-2 text-warning">Potential issue</h3>
                 <div class="card-img-top" id="interval-counts-issue"></div>
-                <p class="card-text">Unequal distribution among chromosomes could mean
-                    a filter has been applied unevenly or possible file truncation.
-                </p>
+                <p class="card-text">Unequal distribution among chromosomes could mean a filter has been applied
+                    unevenly or possible file truncation.</p>
             </div>
         </div>
     </div>
@@ -283,23 +268,19 @@
     </div>
     <div class="offcanvas-body">
         <div class="row pb-3">
-            <div class="card-body">
-                Intersecting a BED with known intervals can help us determine the genome by way of
-                elimination (using gaps). It can also instruct us whether or not our intervals hit
-                genes, exons, or introns, which can help sanity check intervals by genome build or
-                per your science question. For instance, if you assume your intervals are exonic
-                then one would expect zero hits with Ensembl introns.
+            <div class="card-body">Intersecting a BED with known intervals can help us determine the genome by way of
+                elimination (using gaps). It can also instruct us whether or not our intervals hit genes, exons, or
+                introns, which can help sanity check intervals by genome build or per your science question. For
+                instance, if you assume your intervals are exonic then one would expect zero hits with Ensembl introns.
             </div>
         </div>
         <div class="row pb-3">
             <div class="card-body">
                 <h3 class="card-subtitle mb-2 text-success">Normal</h3>
                 <div class="card-img-top" id="intersect-gap-normal"></div>
-                <p class="card-text pt-2">Our intervals, in the case of intersecting with Gaps, do
-                    not overlap structures like telomeres and centromeres of the selected genome
-                    build, suggesting the selected genome build is
-                    <span class="fw-bold fst-italic">not incorrect</span>.
-                </p>
+                <p class="card-text pt-2">Our intervals, in the case of intersecting with Gaps, do not overlap
+                    structures like telomeres and centromeres of the selected genome build, suggesting the selected
+                    genome build is <span class="fw-bold fst-italic">not incorrect</span>.</p>
             </div>
         </div>
         <div class="row pb-3">
@@ -314,8 +295,7 @@
     </div>
 </div>
 
-<main class="container-fluid" id="content">
-</main>
+<main class="container-fluid" id="content"></main>
 
 <div class="container">
     <footer class="d-flex flex-wrap justify-content-between align-items-center">
@@ -336,18 +316,17 @@
 </div>
 
 <script type="module">
-
     const plot_config = {
         displaylogo: false,
         toImageButtonOptions: {
-            format: 'svg', // one of png, svg, jpeg, webp
-            filename: 'bedqc',
+            format: "svg", // one of png, svg, jpeg, webp
+            filename: "bedqc",
             height: 600,
             width: 1200,
-            scale: 1 // Multiply title/legend/axis/canvas sizes by this factor
+            scale: 1, // Multiply title/legend/axis/canvas sizes by this factor
         },
         responsive: true,
-    }
+    };
     const aesthetics = {
         height: 375,
         palette: ["#4e79a7", "#f28e2c", "#e15759", "#76b7b2", "#59a14f", "#edc949", "#af7aa1", "#ff9da7", "#9c755f", "#bab0ab"],
@@ -359,76 +338,76 @@
         labelfont: {
             family: "Raleway, sans-serif",
             size: 12,
-        }
-    }
+        },
+    };
 
-    const sort_alphanum = (a, b) => a.localeCompare(b, 'en', { numeric: true })
+    const sort_alphanum = (a, b) => a.localeCompare(b, "en", { numeric: true });
 
     const build_example_plot = ({ x, o, e, divid, ytitle }) => {
-        let traces = [{ x: x, y: o, type: "bar", marker: { color: aesthetics.palette[0], line: { color: 'black', width: 1 }, }, name: "Observed" }];
+        let traces = [{ x: x, y: o, type: "bar", marker: { color: aesthetics.palette[0], line: { color: "black", width: 1 } }, name: "Observed" }];
         if (e.length > 0) {
-            traces.push({ x: x, y: e, type: "scatter", name: "Expected", mode: "markers", marker: { size: 12, symbol: "circle", color: "#f28e2c", line: { color: 'rgb(255,255,255)', width: 1 }, } })
+            traces.push({ x: x, y: e, type: "scatter", name: "Expected", mode: "markers", marker: { size: 12, symbol: "circle", color: "#f28e2c", line: { color: "rgb(255,255,255)", width: 1 } } });
         }
-        let layout = { height: 200, font: aesthetics.labelfont, padding: { t: 0, r: 0, b: 0 }, margin: { t: 0, r: 0, b: 0 }, xaxis: { automargin: true, type: "category", }, yaxis: { title: ytitle, automargin: true, }, legend: { font: { size: 12 } } };
+        let layout = { height: 200, font: aesthetics.labelfont, padding: { t: 0, r: 0, b: 0 }, margin: { t: 0, r: 0, b: 0 }, xaxis: { automargin: true, type: "category" }, yaxis: { title: ytitle, automargin: true }, legend: { font: { size: 12 } } };
         Plotly.newPlot(divid, traces, layout, { staticPlot: true, responsive: true });
-    }
+    };
 
     build_example_plot({
         x: ["chr1", "chr2", "chr3"],
         o: [0.075, 0.079, 0.06],
         e: [0.08, 0.07, 0.06],
         divid: "interval-density-normal",
-        ytitle: "Density"
-    })
+        ytitle: "Density",
+    });
 
     build_example_plot({
         x: ["chr1", "chr2", "chr3"],
         o: [0.075, 0.13, 0.025],
         e: [0.08, 0.07, 0.06],
         divid: "interval-density-issue",
-        ytitle: "Density"
-    })
+        ytitle: "Density",
+    });
 
     build_example_plot({
         x: ["chr1", "chr2", "chr3"],
         o: [100, 90, 80],
         e: [95, 94, 78],
         divid: "interval-counts-normal",
-        ytitle: "Density"
-    })
+        ytitle: "Density",
+    });
 
     build_example_plot({
         x: ["chr1", "chr2", "chr3"],
         o: [100, 132, 18],
         e: [95, 94, 78],
         divid: "interval-counts-issue",
-        ytitle: "Density"
-    })
+        ytitle: "Density",
+    });
 
     build_example_plot({
         x: ["chr1", "chr2", "chr3"],
         o: [0, 0, 0],
         e: [],
         divid: "intersect-gap-normal",
-        ytitle: "Count"
-    })
+        ytitle: "Count",
+    });
 
     build_example_plot({
         x: ["chr1", "chr2", "chr3"],
         o: [50, 57, 22],
         e: [],
         divid: "intersect-gap-issue",
-        ytitle: "Count"
-    })
+        ytitle: "Count",
+    });
 
     const add_plot_div = (track, title, pb = 2) => {
-        let d = document.getElementById("content")
+        let d = document.getElementById("content");
 
         let exists = document.getElementById(`${track}-row`);
-        if (!(exists)) {
+        if (!exists) {
             d.insertAdjacentHTML(
-                'beforeend',
-                `<div class="container-fluid row pb-${pb}">
+                "beforeend",
+                `<div class="container-fluid row mx-auto pb-${pb}">
                     <div class="col-lg-8 mx-auto p-0">
                         <div class="row" id="${track}-row">
                             <div class="col-12">
@@ -443,21 +422,21 @@
                     </div>
                 </div>
                 `
-            )
+            );
         }
-        return Promise.resolve()
-    }
+        return Promise.resolve();
+    };
 
     const add_table_row = ({ title, value, warn, validation }) => {
-        let divid = title.replace(" ", "-")
-        let d = document.getElementById("metadata-table")
-        let exists = document.getElementById(divid)
-        let text_color = warn ? "text-danger" : "text-primary"
-        let validation_col = ""
+        let divid = title.replace(" ", "-");
+        let d = document.getElementById("metadata-table");
+        let exists = document.getElementById(divid);
+        let text_color = warn ? "text-danger" : "text-primary";
+        let validation_col = "";
         if (validation) {
-            validation_col = warn ? `<td class="text-danger"><i class="bi bi-exclamation-triangle-fill"></i></td>` : `<td class="text-success"><i class="bi bi-check-circle-fill"></i></td>`
+            validation_col = warn ? `<td class="text-danger"><i class="bi bi-exclamation-triangle-fill"></i></td>` : `<td class="text-success"><i class="bi bi-check-circle-fill"></i></td>`;
         }
-        if (!(exists)) {
+        if (!exists) {
             d.insertAdjacentHTML(
                 "beforeend",
                 `<tr>
@@ -465,11 +444,11 @@
                     <td id="${divid}" class="${text_color}"><pre>${value}</pre></td>
                     ${validation_col}
                 </tr>`
-            )
+            );
         } else {
-            $(`#${divid}`).html(value)
+            $(`#${divid}`).html(value);
         }
-    }
+    };
 
     let CLI = await new Aioli("bedtools/2.29.2", { printInterleaved: false });
     const output = await CLI.exec("bedtools --version");
@@ -477,71 +456,68 @@
 
     const strip_prefix = (str) => {
         if (str.startsWith("chr")) {
-            return str.slice(3)
+            return str.slice(3);
         }
-        return str
-    }
+        return str;
+    };
 
     let chromosome_lengths = {};
-    let prefix = true
+    let prefix = true;
 
     const to_title = (str) => {
-        return str.replace(
-            /\w\S*/g,
-            (txt) => {
-                return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
-            }
-        )
-    }
+        return str.replace(/\w\S*/g, (txt) => {
+            return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+        });
+    };
 
     const scroll_to = (id) => {
         const yOffset = -10;
         const element = document.getElementById(id);
         const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
 
-        window.scrollTo({ top: y, behavior: 'smooth' });
-    }
+        window.scrollTo({ top: y, behavior: "smooth" });
+    };
 
     const bedtools_intersect = async (genome, track, chromosomes, prefix) => {
         let table;
         let cmd = "bedtools intersect -sorted";
         if (track == "gap") {
-            table = `${genome}_gap.bed.gz`
+            table = `${genome}_gap.bed.gz`;
         } else if (track.startsWith("Ensembl")) {
-            cmd += " -u"
+            cmd += " -u";
             if (track.endsWith("whole)")) {
-                table = `${genome}_ensembl_gene_wholegene.bed.gz`
+                table = `${genome}_ensembl_gene_wholegene.bed.gz`;
             } else if (track.endsWith("exon)")) {
-                table = `${genome}_ensembl_gene_exon.bed.gz`
+                table = `${genome}_ensembl_gene_exon.bed.gz`;
             } else if (track.endsWith("intron)")) {
-                table = `${genome}_ensembl_gene_intron.bed.gz`
+                table = `${genome}_ensembl_gene_intron.bed.gz`;
             } else if (track.endsWith("CDS)")) {
-                table = `${genome}_ensembl_gene_cds.bed.gz`
+                table = `${genome}_ensembl_gene_cds.bed.gz`;
             }
         } else {
-            console.log("selected table was not accounted for in `bedtools intersect`")
+            console.log("selected table was not accounted for in `bedtools intersect`");
         }
 
-        let remote_file = `bedqc.s3.amazonaws.com/${table}`
-        if (!(global_data.chr_prefix)) {
-            remote_file = remote_file.replace(".bed.gz", "_noprefix.bed.gz")
+        let remote_file = `bedqc.s3.amazonaws.com/${table}`;
+        if (!global_data.chr_prefix) {
+            remote_file = remote_file.replace(".bed.gz", "_noprefix.bed.gz");
         }
         try {
-            await CLI.mount(`https://${remote_file}`)
+            await CLI.mount(`https://${remote_file}`);
         } catch (error) {
-            console.log("file likely already exists. ignoring error.")
+            console.log("file likely already exists. ignoring error.");
             console.error(error);
         }
         // console.log("ls:", await CLI.ls("."));
 
         // intersect user upload and UCSC track
-        let o = await CLI.exec(`${cmd} -a a.bed -b ${remote_file.replace("/", "-")}`)
-        o.stdout = o.stdout.split("\n").map(p => p.split("\t"))
+        let o = await CLI.exec(`${cmd} -a a.bed -b ${remote_file.replace("/", "-")}`);
+        o.stdout = o.stdout.split("\n").map((p) => p.split("\t"));
 
-        let chr_count = {}
-        o.stdout.forEach(row => {
+        let chr_count = {};
+        o.stdout.forEach((row) => {
             chr_count[row[0]] = (chr_count[row[0]] || 0) + 1;
-        })
+        });
 
         let content = document.getElementById("content");
         let idx = global_data.input_test_count;
@@ -549,11 +525,11 @@
         let secondary = $(`#hypothesis-secondary-${idx}`).val();
 
         genome = $(`#hypothesis-genome-${idx}`).val();
-        let err_msg = o.stderr ? `<div class="col-12 pb-2"><div><code>${o.stderr}</code></div></div>` : ""
+        let err_msg = o.stderr ? `<div class="col-12 pb-2"><div><code>${o.stderr}</code></div></div>` : "";
 
         content.insertAdjacentHTML(
-            'beforeend',
-            `<div class="container-fluid row pb-3">
+            "beforeend",
+            `<div class="container-fluid row mx-auto pb-3">
                 <div class="d-flex col-1 justify-content-end"><code>Out[${idx}]</code></div>
                 <div class="col-lg-11 p-0">
                     <div class="d-flex flex-row">
@@ -571,51 +547,51 @@
                 </div>
             </div>
             `
-        )
+        );
 
         build_bar_plot(
             chromosomes,
-            chromosomes.map(chr => chr_count[chr]),
+            chromosomes.map((chr) => chr_count[chr]),
             "Chromosome",
             "Overlap count",
             `hypothesis-${idx}-plot`
-        )
-    }
+        );
+    };
 
     const delimiter_string = (sep) => {
         if (sep == "\t") {
-            return "tab"
+            return "tab";
         } else if (sep == " ") {
-            return "space"
+            return "space";
         } else {
-            return sep
+            return sep;
         }
-    }
+    };
 
     const newline_string = (nl) => {
         if (nl == "\n") {
-            return "\\n"
+            return "\\n";
         } else if (nl == "\r\n") {
-            return "\\r\\n"
+            return "\\r\\n";
         } else {
-            return `${nl}`
+            return `${nl}`;
         }
-    }
+    };
 
     const build_input_test = () => {
-        global_data.input_test_count += 1
-        let idx = global_data.input_test_count
-        let genome = global_data.previous_genome
+        global_data.input_test_count += 1;
+        let idx = global_data.input_test_count;
+        let genome = global_data.previous_genome;
         // defaults
-        let primary = global_data.previous_primary_action
-        let secondary = global_data.previous_secondary_action
-        let title = `${to_title(primary)} ${genome} ${secondary} count`
+        let primary = global_data.previous_primary_action;
+        let secondary = global_data.previous_secondary_action;
+        let title = `${to_title(primary)} ${genome} ${secondary} count`;
 
-        let d = document.getElementById("content")
+        let d = document.getElementById("content");
 
         d.insertAdjacentHTML(
             "beforeend",
-            `<div class="container-fluid row pb-2">
+            `<div class="container-fluid row mx-auto pb-2">
                 <div class="d-flex col-1 text-primary justify-content-end">
                     <code>In [${idx}]</code>
                 </div>
@@ -667,17 +643,17 @@
                 </div>
             </div>
             `
-        )
+        );
 
-        $(`#hypothesis-primary-${idx}`).val(global_data.previous_primary_action)
-        $(`#hypothesis-secondary-${idx}`).val(global_data.previous_secondary_action)
+        $(`#hypothesis-primary-${idx}`).val(global_data.previous_primary_action);
+        $(`#hypothesis-secondary-${idx}`).val(global_data.previous_secondary_action);
         $(`#hypothesis-genome-${idx}`).val(genome);
 
         update_hypothesis_blurb();
 
-        if (!(global_data.previous_primary_action.startsWith("Calculate"))) {
+        if (!global_data.previous_primary_action.startsWith("Calculate")) {
             // show all selects
-            $(`#hypothesis-secondary-wrapper-${idx}`).prop("hidden", false)
+            $(`#hypothesis-secondary-wrapper-${idx}`).prop("hidden", false);
         }
 
         // 'Run' click
@@ -685,15 +661,15 @@
         // select input changes
         let elements = document.getElementsByClassName("form-select hyp-test");
         Array.from(elements).forEach(function (element) {
-            element.addEventListener('change', update_hypothesis_blurb);
+            element.addEventListener("change", update_hypothesis_blurb);
         });
 
-        return Promise.resolve()
-    }
+        return Promise.resolve();
+    };
 
     const run_hypothesis_action = async () => {
         let idx = global_data.input_test_count;
-        let action = $(`#hypothesis-primary-${idx}`).val()
+        let action = $(`#hypothesis-primary-${idx}`).val();
         let genome = $(`#hypothesis-genome-${idx}`).val();
         let track = $(`#hypothesis-secondary-${idx}`).val();
 
@@ -705,26 +681,27 @@
         $(".hyp-test:enabled").prop("disabled", true);
 
         let chromosome_lengths;
-        jQuery.getJSON(`https://api.genome.ucsc.edu/list/chromosomes?genome=${genome}`, (d) => {
-            if (global_data.chr_prefix) {
-                chromosome_lengths = d.chromosomes;
-            } else {
-                // non-chr prefixed chroms
-                Object.keys(d.chromosomes)
-                    .map(k => chromosome_lengths[k.substring(3)] = d.chromosomes[k]);
-            }
-        }).then(async () => {
-            let genome_length = 0;
-            let display_chroms = Object.keys(chromosome_lengths).filter(k => k.match(/fix|random|alt|Un|hap|MT|M/g) === null);
-            display_chroms.sort(sort_alphanum)
-            // length of genome with only primary chromosomes
-            display_chroms.map(x => genome_length += chromosome_lengths[x]);
-            let content = document.getElementById("content")
+        jQuery
+            .getJSON(`https://api.genome.ucsc.edu/list/chromosomes?genome=${genome}`, (d) => {
+                if (global_data.chr_prefix) {
+                    chromosome_lengths = d.chromosomes;
+                } else {
+                    // non-chr prefixed chroms
+                    Object.keys(d.chromosomes).map((k) => (chromosome_lengths[k.substring(3)] = d.chromosomes[k]));
+                }
+            })
+            .then(async () => {
+                let genome_length = 0;
+                let display_chroms = Object.keys(chromosome_lengths).filter((k) => k.match(/fix|random|alt|Un|hap|MT|M/g) === null);
+                display_chroms.sort(sort_alphanum);
+                // length of genome with only primary chromosomes
+                display_chroms.map((x) => (genome_length += chromosome_lengths[x]));
+                let content = document.getElementById("content");
 
-            if (action == "Calculate interval densities") {
-                content.insertAdjacentHTML(
-                    'beforeend',
-                    `<div class="container-fluid row pb-3">
+                if (action == "Calculate interval densities") {
+                    content.insertAdjacentHTML(
+                        "beforeend",
+                        `<div class="container-fluid row mx-auto pb-3">
                             <div class="d-flex col-1 justify-content-end"><code>Out[${idx}]</code></div>
                             <div class="col-lg-11 p-0">
                                 <div class="d-flex flex-row">
@@ -741,33 +718,36 @@
                             </div>
                         </div>
                         `
-                )
+                    );
 
-                build_bar_plot(
-                    display_chroms,
-                    display_chroms.map(k => global_data.chr_interval_count[k] / global_data.interval_count_filtered),
-                    "Chromosome",
-                    "Density",
-                    `hypothesis-${idx}-plot`,
-                    {
-                        x: display_chroms,
-                        y: display_chroms.map(x => (chromosome_lengths[x] / genome_length)),
-                        type: "scatter",
-                        name: "Expected",
-                        mode: "markers",
-                        marker: {
-                            size: 12, symbol: "circle", color: "#f28e2c", line: {
-                                color: 'rgb(255,255,255)',
-                                width: 1
+                    build_bar_plot(
+                        display_chroms,
+                        display_chroms.map((k) => global_data.chr_interval_count[k] / global_data.interval_count_filtered),
+                        "Chromosome",
+                        "Density",
+                        `hypothesis-${idx}-plot`,
+                        {
+                            x: display_chroms,
+                            y: display_chroms.map((x) => chromosome_lengths[x] / genome_length),
+                            type: "scatter",
+                            name: "Expected",
+                            mode: "markers",
+                            marker: {
+                                size: 12,
+                                symbol: "circle",
+                                color: "#f28e2c",
+                                line: {
+                                    color: "rgb(255,255,255)",
+                                    width: 1,
+                                },
                             },
                         }
-                    }
-                );
-                build_input_test()
-            } else if (action == "Calculate interval counts") {
-                content.insertAdjacentHTML(
-                    'beforeend',
-                    `<div class="container-fluid row pb-3">
+                    );
+                    build_input_test();
+                } else if (action == "Calculate interval counts") {
+                    content.insertAdjacentHTML(
+                        "beforeend",
+                        `<div class="container-fluid row mx-auto pb-3">
                             <div class="d-flex col-1 justify-content-end"><code>Out[${idx}]</code></div>
                             <div class="col-lg-11 p-0">
                                 <div class="d-flex flex-row">
@@ -784,75 +764,77 @@
                             </div>
                         </div>
                         `
-                )
+                    );
 
-                build_bar_plot(
-                    display_chroms,
-                    display_chroms.map(k => global_data.chr_interval_count[k]),
-                    "Chromosome",
-                    "Count",
-                    `hypothesis-${idx}-plot`,
-                    {
-                        x: display_chroms,
-                        y: display_chroms.map(k => global_data.interval_count_filtered * (chromosome_lengths[k] / genome_length)),
-                        type: "scatter",
-                        name: "Expected",
-                        mode: "markers",
-                        marker: {
-                            size: 12, symbol: "circle", color: "#f28e2c", line: {
-                                color: 'rgb(255,255,255)',
-                                width: 1
+                    build_bar_plot(
+                        display_chroms,
+                        display_chroms.map((k) => global_data.chr_interval_count[k]),
+                        "Chromosome",
+                        "Count",
+                        `hypothesis-${idx}-plot`,
+                        {
+                            x: display_chroms,
+                            y: display_chroms.map((k) => global_data.interval_count_filtered * (chromosome_lengths[k] / genome_length)),
+                            type: "scatter",
+                            name: "Expected",
+                            mode: "markers",
+                            marker: {
+                                size: 12,
+                                symbol: "circle",
+                                color: "#f28e2c",
+                                line: {
+                                    color: "rgb(255,255,255)",
+                                    width: 1,
+                                },
                             },
                         }
-                    }
-                );
-                build_input_test()
-            } else if (action == "Intersect") {
-                await bedtools_intersect(genome, track, display_chroms, global_data.chr_prefix)
-                build_input_test()
-            } else {
-                console.log("Unaccounted for action selected.")
-            }
-            scroll_to(`hypothesis-${idx}-anchor`)
-        })
-    }
+                    );
+                    build_input_test();
+                } else if (action == "Intersect") {
+                    await bedtools_intersect(genome, track, display_chroms, global_data.chr_prefix);
+                    build_input_test();
+                } else {
+                    console.log("Unaccounted for action selected.");
+                }
+                scroll_to(`hypothesis-${idx}-anchor`);
+            });
+    };
 
     const update_hypothesis_blurb = (event) => {
-        let idx = global_data.input_test_count
-        let filename = (typeof global_data.file_obj === 'string' || global_data.file_obj instanceof String) ? global_data.file_obj.split(/[\\/]/).pop() : global_data.file_obj.name
-        let primary = $(`#hypothesis-primary-${idx}`).val()
-        let secondary = $(`#hypothesis-secondary-${idx}`).val()
+        let idx = global_data.input_test_count;
+        let filename = typeof global_data.file_obj === "string" || global_data.file_obj instanceof String ? global_data.file_obj.split(/[\\/]/).pop() : global_data.file_obj.name;
+        let primary = $(`#hypothesis-primary-${idx}`).val();
+        let secondary = $(`#hypothesis-secondary-${idx}`).val();
         let genome = $(`#hypothesis-genome-${idx}`).val();
         let str = "";
 
         if (primary.startsWith("Calculate")) {
-            str = `Select the genome build of ${filename}.`
+            str = `Select the genome build of ${filename}.`;
             // hide the secondary select box
-            $(`#hypothesis-secondary-wrapper-${idx}`).prop("hidden", true)
+            $(`#hypothesis-secondary-wrapper-${idx}`).prop("hidden", true);
         } else if (primary == "Intersect") {
-            $(`#hypothesis-secondary-wrapper-${idx}`).prop("hidden", false)
+            $(`#hypothesis-secondary-wrapper-${idx}`).prop("hidden", false);
             if (secondary == "gap") {
-                str = `If your intervals intersect with many gaps across chromosomes, ${genome} may not be the underlying genome build of ${filename}.`
+                str = `If your intervals intersect with many gaps across chromosomes, ${genome} may not be the underlying genome build of ${filename}.`;
             } else {
-                str = `Intersect the intervals in ${filename} with Ensembl gene elements.`
+                str = `Intersect the intervals in ${filename} with Ensembl gene elements.`;
             }
         }
-        $(`#hypothesis-blurb-${idx}`).html(str)
-    }
-
-    const update_button = (event) => {
-        $("#button-alert").prop("hidden", false)
-    }
-
-    let global_data = {
+        $(`#hypothesis-blurb-${idx}`).html(str);
     };
 
+    const update_button = (event) => {
+        $("#button-alert").prop("hidden", false);
+    };
+
+    let global_data = {};
+
     const build_table = (arr) => {
-        let content = document.getElementById("content")
+        let content = document.getElementById("content");
         content.insertAdjacentHTML(
-            'beforeend',
+            "beforeend",
             `
-            <div class="container-fluid row pb-5">
+            <div class="container-fluid row mx-auto pb-5">
                 <div class="col-lg-8 mx-auto px-0">
                     <div class="row">
                         <div class="col-12">
@@ -865,7 +847,7 @@
                 </div>
             </div>
             `
-        )
+        );
 
         let cols = [
             { data: "chr", title: "Chromosome" },
@@ -873,32 +855,32 @@
             { data: "max", title: "Maximum" },
             { data: "mean", title: "Mean" },
             { data: "median", title: "Median" },
-            { data: "mode", title: "Mode" }
-        ]
+            { data: "mode", title: "Mode" },
+        ];
 
         $("#chrom-stats-table").DataTable({
             data: arr,
             columns: cols,
-            scrollY: '400px',
+            scrollY: "400px",
             scrollX: true,
             scrollCollapse: true,
             paging: false,
             dom: 'rt<"clear">',
-            order: [[0, 'asc']],
-        })
-    }
+            order: [[0, "asc"]],
+        });
+    };
 
     const file_upload = (event) => {
-        $("#introduction").prop("hidden", true)
-        $("#example-loading").prop("hidden", false)
-        $("#file-size-warning").prop("hidden", true)
+        $("#introduction").prop("hidden", true);
+        $("#example-loading").prop("hidden", false);
+        $("#file-size-warning").prop("hidden", true);
         // clean up existing divs
         $("#content").empty();
 
-        let d = document.getElementById("content")
+        let d = document.getElementById("content");
         d.insertAdjacentHTML(
             "beforeend",
-            `<div class="container-fluid row pb-5">
+            `<div class="container-fluid row mx-auto pb-5">
                 <div class="col-lg-8 mx-auto bg-light border pt-2" id="file-validation" hidden>
                     <table class="table table-borderless m-0">
                         <tbody id="metadata-table">
@@ -906,7 +888,7 @@
                     </table>
                 </div>
             </div>`
-        )
+        );
 
         let bed = [];
 
@@ -925,25 +907,25 @@
             extends_beyond_chr: 0,
             chr_prefix: true,
             chromosomes: [],
-            all_chromosomes: []
+            all_chromosomes: [],
         };
 
         let file_obj = "";
         // handle loading example data
         if (event.type == "click") {
-            if (event.target.getAttribute('id') == "load-example-cgpislands") {
-                file_obj = "https://bedqc.s3.amazonaws.com/CpG_islands_GRCh38.bed"
-            } else if (event.target.getAttribute('id') == "load-example-truncatedexons") {
-                file_obj = "https://bedqc.s3.amazonaws.com/Truncated_exons_GRCh38.bed"
+            if (event.target.getAttribute("id") == "load-example-cgpislands") {
+                file_obj = "https://bedqc.s3.amazonaws.com/CpG_islands_GRCh38.bed";
+            } else if (event.target.getAttribute("id") == "load-example-truncatedexons") {
+                file_obj = "https://bedqc.s3.amazonaws.com/Truncated_exons_GRCh38.bed";
             }
         } else {
-            file_obj = $('#file-upload').prop('files')[0]
+            file_obj = $("#file-upload").prop("files")[0];
             if (file_obj.size > 104857600) {
-                $("#file-size-warning").prop("hidden", false)
-                $("#file-size-warning").html(`File size was larger than our recommended limit of 100MB [${(file_obj.size / 1024 / 1024).toFixed(2)} MB]`)
-                $("#introduction").prop("hidden", false)
-                $("#example-loading").prop("hidden", true)
-                return
+                $("#file-size-warning").prop("hidden", false);
+                $("#file-size-warning").html(`File size was larger than our recommended limit of 100MB [${(file_obj.size / 1024 / 1024).toFixed(2)} MB]`);
+                $("#introduction").prop("hidden", false);
+                $("#example-loading").prop("hidden", true);
+                return;
             }
         }
 
@@ -956,8 +938,8 @@
             previous_primary_action: "Calculate interval densities",
             previous_secondary_action: "gap",
             previous_genome: "hg38",
-            chromosomes: []
-        }
+            chromosomes: [],
+        };
 
         if (global_data.file_obj) {
             Papa.parse(global_data.file_obj, {
@@ -970,14 +952,14 @@
 
                     // incorrect line ending
                     if (!(res.meta.linebreak == "\n")) {
-                        console.log("found bad line break")
-                        data.newline = res.meta.linebreak
+                        console.log("found bad line break");
+                        data.newline = res.meta.linebreak;
                         // parser.abort()
                     }
                     // not tab delimited
                     if (!(res.meta.delimiter == "\t")) {
-                        console.log("found bad delimiter")
-                        data.delimiter = res.meta.delimiter
+                        console.log("found bad delimiter");
+                        data.delimiter = res.meta.delimiter;
                         // parser.abort()
                     }
                     // most likely a delimiter issue
@@ -985,39 +967,39 @@
                         // this file does not have at least 3 fields per line
                         // offending line is d.interval_count with values
                         // res.data
-                        console.log("aborting:", res.data)
-                        data.missing_data = data.interval_count
-                        parser.abort()
+                        console.log("aborting:", res.data);
+                        data.missing_data = data.interval_count;
+                        parser.abort();
                     }
                     // collect shape of bed data
-                    if (!(data.n_of_fields.includes(res.data.length))) {
-                        data.n_of_fields.push(res.data.length)
+                    if (!data.n_of_fields.includes(res.data.length)) {
+                        data.n_of_fields.push(res.data.length);
                     }
 
                     let chr = res.data[0];
-                    res.data[1] = parseInt(res.data[1])
-                    res.data[2] = parseInt(res.data[2])
+                    res.data[1] = parseInt(res.data[1]);
+                    res.data[2] = parseInt(res.data[2]);
                     let current_length = res.data[2] - res.data[1];
-                    if (!(chr.startsWith('chr'))) {
-                        global_data.chr_prefix = false
+                    if (!chr.startsWith("chr")) {
+                        global_data.chr_prefix = false;
                     }
 
                     // set the chromosome order by appearance in bed file
                     if (!(chr in data.chr_interval_length)) {
-                        data.all_chromosomes.push(chr)
-                        data.chr_interval_lengths[chr] = []
+                        data.all_chromosomes.push(chr);
+                        data.chr_interval_lengths[chr] = [];
                     }
 
                     // malformatted entry; 0-based start, 1-based end
                     if (current_length == 0) {
                         data.zero_length_intervals += 1;
-                        res.data[1] -= 1
+                        res.data[1] -= 1;
                     }
 
                     // only saving user data on primary chroms
                     if (chr.match(/fix|random|alt|Un|hap|MT|M/g) === null) {
                         global_data.interval_count_filtered += 1;
-                        bed.push(res.data.slice(0, 3))
+                        bed.push(res.data.slice(0, 3));
                         // this eval is duplicated
                         if (!(chr in data.chr_interval_length)) {
                             global_data.chromosomes.push(chr);
@@ -1029,62 +1011,62 @@
                     // simplifies calculating genome length
                     data.chr_interval_length[chr] = (data.chr_interval_length[chr] || 0) + current_length;
                     // used to build info table
-                    data.chr_interval_lengths[chr].push(current_length)
+                    data.chr_interval_lengths[chr].push(current_length);
                     global_data.chr_interval_count[chr] = (global_data.chr_interval_count[chr] || 0) + 1;
                 },
                 complete: async (res, file) => {
-                    $("#example-loading").prop("hidden", true)
+                    $("#example-loading").prop("hidden", true);
                     // resize the upload area
-                    let el = document.getElementById("file-upload")
+                    let el = document.getElementById("file-upload");
                     // $(".form-control-lg::file-selector-button").attr("style", "min-height:")
                     // show the file stats
-                    $("#file-validation").prop("hidden", false)
+                    $("#file-validation").prop("hidden", false);
                     if (!(data.delimiter == "\t")) {
-                        add_table_row({ title: "File delimiter", value: delimiter_string(data.delimiter), warn: true, validation: true })
+                        add_table_row({ title: "File delimiter", value: delimiter_string(data.delimiter), warn: true, validation: true });
                     } else {
-                        add_table_row({ title: "File delimiter", value: delimiter_string(data.delimiter), validation: true })
+                        add_table_row({ title: "File delimiter", value: delimiter_string(data.delimiter), validation: true });
                     }
                     if (!(data.newline == "\n")) {
-                        add_table_row({ title: "File newline", value: newline_string(data.newline), warn: true, validation: true })
+                        add_table_row({ title: "File newline", value: newline_string(data.newline), warn: true, validation: true });
                     } else {
-                        add_table_row({ title: "File newline", value: newline_string(data.newline), validation: true })
+                        add_table_row({ title: "File newline", value: newline_string(data.newline), validation: true });
                     }
                     if (!(data.missing_data == 0)) {
-                        add_table_row({ title: "Incomplete data on line", value: data.missing_data, warn: true, validation: true })
-                        return
+                        add_table_row({ title: "Incomplete data on line", value: data.missing_data, warn: true, validation: true });
+                        return;
                     } else {
                         // < !--0 - length intervals-- >
                         if (data.zero_length_intervals > 0) {
-                            add_table_row({ title: "0-length intervals", value: data.zero_length_intervals.toLocaleString(), warn: true, validation: true })
+                            add_table_row({ title: "0-length intervals", value: data.zero_length_intervals.toLocaleString(), warn: true, validation: true });
                         } else {
-                            add_table_row({ title: "0-length intervals", value: data.zero_length_intervals.toLocaleString(), validation: true })
+                            add_table_row({ title: "0-length intervals", value: data.zero_length_intervals.toLocaleString(), validation: true });
                         }
                         // < !--number of fields per line-- >
-                        add_table_row({ title: "BED fields", value: data.n_of_fields.join(",") })
+                        add_table_row({ title: "BED fields", value: data.n_of_fields.join(",") });
                         // < !--interval count-- >
-                        add_table_row({ title: "Total interval count", value: data.interval_count.toLocaleString() })
+                        add_table_row({ title: "Total interval count", value: data.interval_count.toLocaleString() });
                         // < !--total nucleotides-- >
-                        add_table_row({ title: "Total nucleotides", value: data.interval_length_total.toLocaleString() })
+                        add_table_row({ title: "Total nucleotides", value: data.interval_length_total.toLocaleString() });
                         // show the interval size dist
-                        add_plot_div('interval-size-dist', 'Interval length distribution', 2).then(() => {
+                        add_plot_div("interval-size-dist", "Interval length distribution", 2).then(() => {
                             var trace = {
                                 x: data.interval_lengths,
-                                type: 'histogram',
-                                marker: { color: aesthetics.palette[0], },
+                                type: "histogram",
+                                marker: { color: aesthetics.palette[0] },
                             };
                             let layout = {
                                 height: 225,
                                 font: aesthetics.labelfont,
-                                padding: { t: 0, r: 15, },
-                                margin: { t: 0, r: 15, },
-                                xaxis: { title: "Interval length", automargin: true, },
-                                yaxis: { title: "Count", automargin: true, },
-                                legend: { font: { size: 16 } }
+                                padding: { t: 0, r: 15 },
+                                margin: { t: 0, r: 15 },
+                                xaxis: { title: "Interval length", automargin: true },
+                                yaxis: { title: "Count", automargin: true },
+                                legend: { font: { size: 16 } },
                             };
-                            Plotly.newPlot('interval-size-dist-plot', [trace], layout, plot_config)
-                        })
+                            Plotly.newPlot("interval-size-dist-plot", [trace], layout, plot_config);
+                        });
 
-                        let chr_intervals = []
+                        let chr_intervals = [];
                         for (const [chrom, lengths] of Object.entries(data.chr_interval_lengths)) {
                             chr_intervals.push({
                                 chr: chrom,
@@ -1092,26 +1074,26 @@
                                 max: math.max(lengths),
                                 mean: math.mean(lengths).toFixed(2),
                                 median: math.median(lengths).toFixed(2),
-                                mode: math.mode(lengths)[0]
-                            })
+                                mode: math.mode(lengths)[0],
+                            });
                         }
-                        build_table(chr_intervals)
+                        build_table(chr_intervals);
 
                         // sort by start, asc
-                        bed.sort((a, b) => (a[1] > b[1]) ? 1 : ((a[1] < b[1]) ? -1 : 0))
+                        bed.sort((a, b) => (a[1] > b[1] ? 1 : a[1] < b[1] ? -1 : 0));
                         // sort by chrom, asc
-                        bed.sort((a, b) => (a[0] > b[0]) ? 1 : ((a[0] < b[0]) ? -1 : 0))
+                        bed.sort((a, b) => (a[0] > b[0] ? 1 : a[0] < b[0] ? -1 : 0));
                         build_input_test();
                         // convert bed to string
                         let str = "";
-                        bed.map(a => str += a.join("\t") + "\n");
+                        bed.map((a) => (str += a.join("\t") + "\n"));
                         await CLI.fs.writeFile("a.bed", str);
-                        global_data.chromosomes.sort(sort_alphanum)
+                        global_data.chromosomes.sort(sort_alphanum);
                     }
-                }
-            })
+                },
+            });
         }
-    }
+    };
 
     const build_bar_plot = (chrs, o, x_title, y_title, div, trace = false) => {
         let traces = [
@@ -1122,16 +1104,16 @@
                 marker: {
                     color: aesthetics.palette[0],
                     line: {
-                        color: 'black',
-                        width: 1
+                        color: "black",
+                        width: 1,
                     },
                 },
-                name: "Observed"
-            }
+                name: "Observed",
+            },
         ];
 
         if (trace) {
-            traces.push(trace)
+            traces.push(trace);
         }
 
         let layout = {
@@ -1156,9 +1138,9 @@
             },
             legend: {
                 font: {
-                    size: 16
-                }
-            }
+                    size: 16,
+                },
+            },
         };
 
         return Plotly.newPlot(div, traces, layout, plot_config);
