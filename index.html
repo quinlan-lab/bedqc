@@ -45,6 +45,19 @@
             min-height: 120px;
         }
 
+        .input-group-display {
+            min-height: 122px;
+        }
+
+        #url-upload {
+            font-size: 2rem;
+            width: 155px;
+        }
+
+        #url-input {
+            font-size: 2rem;
+        }
+
         label {
             cursor: pointer;
         }
@@ -106,10 +119,25 @@
         <div class="col-lg-6 mx-auto">
             <p class="lead mb-4">A tool to validate and profile genomic intervals in BED format.</p>
         </div>
-        <div class="col-12 col-lg-6 mx-auto">
-            <input class="form-control form-control-lg" type="file" id="file-upload" />
+        <div class="col-12 col-lg-8 mx-auto p-3">
+            <div class="" id="local-file-upload">
+                <input class="form-control form-control-lg" type="file" id="file-upload" />
+            </div>
+            <div class="" id="remote-file-upload" hidden>
+                <div class="input-group input-group-display">
+                    <button class="btn btn-outline-secondary text-dark" type="button" id="url-upload">Upload</button>
+                    <input type="text" class="form-control" id="url-input"
+                        placeholder="https://GRCh38_refseq_genes.bed">
+                </div>
+            </div>
+            <div class="col-lg-8 mx-auto pt-1 text-muted" hidden>
+                <button class="btn btn-link p-0 align-baseline" id="local-file-btn">Browse for a local file</button>
+                or
+                <button class="btn btn-link p-0 align-baseline" id="remote-file-btn">paste in a URL</button>.
+                100 MB file size limit.
+            </div>
         </div>
-        <div class="col-lg-6 mx-auto text-danger pt-2" id="file-size-warning" hidden></div>
+        <div class="col-lg-8 mx-auto text-danger pt-2" id="file-size-warning" hidden></div>
     </div>
 
     <div id="introduction">
@@ -134,8 +162,8 @@
                     <div>
                         <h2>BED validation</h2>
                         <p>Your file is validated against <a href="https://samtools.github.io/hts-specs/BEDv1.pdf"
-                                class="link-dark">BEDv1 file specifications</a>. Common issues with file delimiter,
-                            newline character, and 0-length intervals are reported after upload.</p>
+                                class="link-dark">BEDv1 file specifications</a>. File delimiter,
+                            newline character, 0-length intervals, and other common issues are reported.</p>
                     </div>
                 </div>
                 <div class="col d-flex align-items-start">
@@ -870,26 +898,7 @@
         });
     };
 
-    const file_upload = (event) => {
-        $("#introduction").prop("hidden", true);
-        $("#example-loading").prop("hidden", false);
-        $("#file-size-warning").prop("hidden", true);
-        // clean up existing divs
-        $("#content").empty();
-
-        let d = document.getElementById("content");
-        d.insertAdjacentHTML(
-            "beforeend",
-            `<div class="container-fluid row mx-auto pb-5">
-                <div class="col-lg-8 mx-auto bg-light border pt-2" id="file-validation" hidden>
-                    <table class="table table-borderless m-0">
-                        <tbody id="metadata-table">
-                        </tbody>
-                    </table>
-                </div>
-            </div>`
-        );
-
+    const process_remote_file = async ({file}) => {
         let bed = [];
 
         let data = {
@@ -910,24 +919,268 @@
             all_chromosomes: [],
         };
 
+        let url = new URL(file)
+
+        // let t = await CLI.mount("https://raw.githubusercontent.com/hoffmangroup/acidbio/master/bed/BED03/good/01-known_scaffolds.bed")
+
+        try {
+            await CLI.mount(url.href)
+        } catch (error) {
+            console.log("file likely already exists. ignoring error.");
+            console.error(error);
+        }
+        console.log("ls:", await CLI.ls("."));
+        let o = await CLI.cat(`${url.host}${url.pathname.replaceAll("/", "-")}`)
+        console.log("o", o)
+
+        process_local_file({file: o, download: false})
+    }
+
+    const process_local_file = async ({file, download, }) => {
+        let bed = [];
+        let file_stream_limit = 1000000
+        let stream_aborted = false;
+
+        let data = {
+            newline: "\n",
+            delimiter: "\t",
+            n_of_fields: [],
+            missing_data: 0,
+            interval_count: 0,
+            interval_length_total: 0,
+            interval_lengths: [],
+            chr_interval_length: {},
+            chr_interval_lengths: {},
+            filtered_intervals: 0,
+            zero_length_intervals: 0,
+            extends_beyond_chr: 0,
+            chr_prefix: true,
+            chromosomes: [],
+            all_chromosomes: [],
+        };
+
+        Papa.parse(file, {
+            download: download,
+            skipEmptyLines: "greedy",
+            header: false,
+            delimitersToGuess: ["\t", ",", " ", "|", ";", Papa.RECORD_SEP, Papa.UNIT_SEP],
+            step: (res, parser) => {
+                data.interval_count += 1;
+
+                if (data.interval_count == file_stream_limit) {
+                    // add warning that we've stopped file streaming prematurely
+                    $("#file-size-warning").prop("hidden", false);
+                    $("#file-size-warning").html(`File too large. Data streaming stopped at line ${file_stream_limit.toLocaleString()}.`);
+                    stream_aborted = true;
+                    parser.abort();
+                }
+
+                // incorrect line ending
+                if (!(res.meta.linebreak == "\n")) {
+                    console.log("found bad line break");
+                    data.newline = res.meta.linebreak;
+                    // parser.abort()
+                }
+                // not tab delimited
+                if (!(res.meta.delimiter == "\t")) {
+                    console.log("found bad delimiter");
+                    data.delimiter = res.meta.delimiter;
+                    // parser.abort()
+                }
+                // most likely a delimiter issue
+                if (res.data.length < 3) {
+                    // this file does not have at least 3 fields per line
+                    // offending line is d.interval_count with values
+                    // res.data
+                    console.log("aborting:", res.data);
+                    data.missing_data = data.interval_count;
+                    parser.abort();
+                }
+                // collect shape of bed data
+                if (!data.n_of_fields.includes(res.data.length)) {
+                    data.n_of_fields.push(res.data.length);
+                }
+
+                let chr = res.data[0];
+                res.data[1] = parseInt(res.data[1]);
+                res.data[2] = parseInt(res.data[2]);
+                let current_length = res.data[2] - res.data[1];
+                if (!chr.startsWith("chr")) {
+                    global_data.chr_prefix = false;
+                }
+
+                // set the chromosome order by appearance in bed file
+                if (!(chr in data.chr_interval_length)) {
+                    data.all_chromosomes.push(chr);
+                    data.chr_interval_lengths[chr] = [];
+                }
+
+                // malformatted entry; 0-based start, 1-based end
+                if (current_length == 0) {
+                    data.zero_length_intervals += 1;
+                    res.data[1] -= 1;
+                }
+
+                // only saving user data on primary chroms
+                if (chr.match(/fix|random|alt|Un|hap|MT|M/g) === null) {
+                    global_data.interval_count_filtered += 1;
+                    bed.push(res.data.slice(0, 3));
+                    // this eval is duplicated
+                    if (!(chr in data.chr_interval_length)) {
+                        global_data.chromosomes.push(chr);
+                    }
+                }
+
+                data.interval_length_total += current_length;
+                data.interval_lengths.push(current_length);
+                // simplifies calculating genome length
+                data.chr_interval_length[chr] = (data.chr_interval_length[chr] || 0) + current_length;
+                // used to build info table
+                data.chr_interval_lengths[chr].push(current_length);
+                global_data.chr_interval_count[chr] = (global_data.chr_interval_count[chr] || 0) + 1;
+            },
+            complete: async (res, file) => {
+                $("#example-loading").prop("hidden", true);
+                // resize the upload area
+                let el = document.getElementById("file-upload");
+                // $(".form-control-lg::file-selector-button").attr("style", "min-height:")
+                // show the file stats
+                $("#file-validation").prop("hidden", false);
+                if (!(data.delimiter == "\t")) {
+                    add_table_row({ title: "File delimiter", value: delimiter_string(data.delimiter), warn: true, validation: true });
+                } else {
+                    add_table_row({ title: "File delimiter", value: delimiter_string(data.delimiter), validation: true });
+                }
+                if (!(data.newline == "\n")) {
+                    add_table_row({ title: "File newline", value: newline_string(data.newline), warn: true, validation: true });
+                } else {
+                    add_table_row({ title: "File newline", value: newline_string(data.newline), validation: true });
+                }
+                if (!(data.missing_data == 0)) {
+                    add_table_row({ title: "Incomplete data on line", value: data.missing_data, warn: true, validation: true });
+                    return;
+                } else {
+                    // < !--0 - length intervals-- >
+                    if (data.zero_length_intervals > 0) {
+                        add_table_row({ title: "0-length intervals", value: data.zero_length_intervals.toLocaleString(), warn: true, validation: true });
+                    } else {
+                        add_table_row({ title: "0-length intervals", value: data.zero_length_intervals.toLocaleString(), validation: true });
+                    }
+                    // < !--number of fields per line-- >
+                    add_table_row({ title: "BED fields", value: data.n_of_fields.join(",") });
+                    // < !--interval count-- >
+                    add_table_row({ title: "Total interval count", value: data.interval_count.toLocaleString(), warn: stream_aborted, validation: stream_aborted })
+                    // < !--total nucleotides-- >
+                    add_table_row({ title: "Total nucleotides", value: data.interval_length_total.toLocaleString() });
+                    // show the interval size dist
+                    add_plot_div("interval-size-dist", "Interval length distribution", 2).then(() => {
+                        var trace = {
+                            x: data.interval_lengths,
+                            type: "histogram",
+                            marker: { color: aesthetics.palette[0] },
+                        };
+                        let layout = {
+                            height: 225,
+                            font: aesthetics.labelfont,
+                            padding: { t: 0, r: 15 },
+                            margin: { t: 0, r: 15 },
+                            xaxis: { title: "Interval length", automargin: true },
+                            yaxis: { title: "Count", automargin: true },
+                            legend: { font: { size: 16 } },
+                        };
+                        Plotly.newPlot("interval-size-dist-plot", [trace], layout, plot_config);
+                    });
+
+                    let chr_intervals = [];
+                    for (const [chrom, lengths] of Object.entries(data.chr_interval_lengths)) {
+                        chr_intervals.push({
+                            chr: chrom,
+                            min: math.min(lengths),
+                            max: math.max(lengths),
+                            mean: math.mean(lengths).toFixed(2),
+                            median: math.median(lengths).toFixed(2),
+                            mode: math.mode(lengths)[0],
+                        });
+                    }
+                    build_table(chr_intervals);
+
+                    // sort by start, asc
+                    bed.sort((a, b) => (a[1] > b[1] ? 1 : a[1] < b[1] ? -1 : 0));
+                    // sort by chrom, asc
+                    bed.sort((a, b) => (a[0] > b[0] ? 1 : a[0] < b[0] ? -1 : 0));
+                    build_input_test();
+                    // convert bed to string
+                    let str = "";
+                    bed.map((a) => (str += a.join("\t") + "\n"));
+                    await CLI.fs.writeFile("a.bed", str);
+                    global_data.chromosomes.sort(sort_alphanum);
+                }
+            },
+        });
+    }
+
+    const file_upload = (event) => {
         let file_obj = "";
+        let ext = "";
+        let url = "";
+
         // handle loading example data
         if (event.type == "click") {
             if (event.target.getAttribute("id") == "load-example-cgpislands") {
                 file_obj = "https://bedqc.s3.amazonaws.com/CpG_islands_GRCh38.bed";
             } else if (event.target.getAttribute("id") == "load-example-truncatedexons") {
                 file_obj = "https://bedqc.s3.amazonaws.com/Truncated_exons_GRCh38.bed";
+            } else {
+                // submit button click
+                let fail = false;
+                try {
+                    url = new URL($("#url-input").val());
+                    if (url.protocol === "http:" || url.protocol === "https:") {
+                        file_obj = url.href;
+                    } else {
+                        file_obj = "";
+                        ext = "Invalid URL"
+                    }
+                } catch (_) {
+                    file_obj = "";
+                    ext = "Invalid URL"
+                }
             }
+            ext = file_obj.split(".").pop() || ext;
         } else {
-            file_obj = $("#file-upload").prop("files")[0];
-            if (file_obj.size > 104857600) {
-                $("#file-size-warning").prop("hidden", false);
-                $("#file-size-warning").html(`File size was larger than our recommended limit of 100MB [${(file_obj.size / 1024 / 1024).toFixed(2)} MB]`);
-                $("#introduction").prop("hidden", false);
-                $("#example-loading").prop("hidden", true);
-                return;
-            }
+            file_obj = $('#file-upload').prop('files')[0];
+            ext = file_obj.name.split(".").pop();
         }
+
+        if (!(ext == "bed")) {
+            $("#file-size-warning").prop("hidden", false);
+            $("#file-size-warning").html(`Upload expected .bed; got [${ext}]`);
+
+            // if they've already run an analysis, let's remove it.
+            $("#introduction").prop("hidden", false);
+            $("#example-loading").prop("hidden", true);
+            $("#content").empty();
+            return
+        }
+
+        $("#introduction").prop("hidden", true);
+        $("#example-loading").prop("hidden", false);
+        $("#file-size-warning").prop("hidden", true);
+        // clean up existing divs
+        $("#content").empty();
+
+        let d = document.getElementById("content");
+        d.insertAdjacentHTML(
+            "beforeend",
+            `<div class="container-fluid row mx-auto pb-5">
+                <div class="col-lg-8 mx-auto bg-light border pt-2" id="file-validation" hidden>
+                    <table class="table table-borderless m-0">
+                        <tbody id="metadata-table">
+                        </tbody>
+                    </table>
+                </div>
+            </div>`
+        );
 
         global_data = {
             file_obj: file_obj,
@@ -942,156 +1195,14 @@
         };
 
         if (global_data.file_obj) {
-            Papa.parse(global_data.file_obj, {
-                download: event.type == "click" ? true : false,
-                skipEmptyLines: true,
-                header: false,
-                delimitersToGuess: ["\t", ",", " ", "|", ";", Papa.RECORD_SEP, Papa.UNIT_SEP],
-                step: (res, parser) => {
-                    data.interval_count += 1;
-
-                    // incorrect line ending
-                    if (!(res.meta.linebreak == "\n")) {
-                        console.log("found bad line break");
-                        data.newline = res.meta.linebreak;
-                        // parser.abort()
-                    }
-                    // not tab delimited
-                    if (!(res.meta.delimiter == "\t")) {
-                        console.log("found bad delimiter");
-                        data.delimiter = res.meta.delimiter;
-                        // parser.abort()
-                    }
-                    // most likely a delimiter issue
-                    if (res.data.length < 3) {
-                        // this file does not have at least 3 fields per line
-                        // offending line is d.interval_count with values
-                        // res.data
-                        console.log("aborting:", res.data);
-                        data.missing_data = data.interval_count;
-                        parser.abort();
-                    }
-                    // collect shape of bed data
-                    if (!data.n_of_fields.includes(res.data.length)) {
-                        data.n_of_fields.push(res.data.length);
-                    }
-
-                    let chr = res.data[0];
-                    res.data[1] = parseInt(res.data[1]);
-                    res.data[2] = parseInt(res.data[2]);
-                    let current_length = res.data[2] - res.data[1];
-                    if (!chr.startsWith("chr")) {
-                        global_data.chr_prefix = false;
-                    }
-
-                    // set the chromosome order by appearance in bed file
-                    if (!(chr in data.chr_interval_length)) {
-                        data.all_chromosomes.push(chr);
-                        data.chr_interval_lengths[chr] = [];
-                    }
-
-                    // malformatted entry; 0-based start, 1-based end
-                    if (current_length == 0) {
-                        data.zero_length_intervals += 1;
-                        res.data[1] -= 1;
-                    }
-
-                    // only saving user data on primary chroms
-                    if (chr.match(/fix|random|alt|Un|hap|MT|M/g) === null) {
-                        global_data.interval_count_filtered += 1;
-                        bed.push(res.data.slice(0, 3));
-                        // this eval is duplicated
-                        if (!(chr in data.chr_interval_length)) {
-                            global_data.chromosomes.push(chr);
-                        }
-                    }
-
-                    data.interval_length_total += current_length;
-                    data.interval_lengths.push(current_length);
-                    // simplifies calculating genome length
-                    data.chr_interval_length[chr] = (data.chr_interval_length[chr] || 0) + current_length;
-                    // used to build info table
-                    data.chr_interval_lengths[chr].push(current_length);
-                    global_data.chr_interval_count[chr] = (global_data.chr_interval_count[chr] || 0) + 1;
-                },
-                complete: async (res, file) => {
-                    $("#example-loading").prop("hidden", true);
-                    // resize the upload area
-                    let el = document.getElementById("file-upload");
-                    // $(".form-control-lg::file-selector-button").attr("style", "min-height:")
-                    // show the file stats
-                    $("#file-validation").prop("hidden", false);
-                    if (!(data.delimiter == "\t")) {
-                        add_table_row({ title: "File delimiter", value: delimiter_string(data.delimiter), warn: true, validation: true });
-                    } else {
-                        add_table_row({ title: "File delimiter", value: delimiter_string(data.delimiter), validation: true });
-                    }
-                    if (!(data.newline == "\n")) {
-                        add_table_row({ title: "File newline", value: newline_string(data.newline), warn: true, validation: true });
-                    } else {
-                        add_table_row({ title: "File newline", value: newline_string(data.newline), validation: true });
-                    }
-                    if (!(data.missing_data == 0)) {
-                        add_table_row({ title: "Incomplete data on line", value: data.missing_data, warn: true, validation: true });
-                        return;
-                    } else {
-                        // < !--0 - length intervals-- >
-                        if (data.zero_length_intervals > 0) {
-                            add_table_row({ title: "0-length intervals", value: data.zero_length_intervals.toLocaleString(), warn: true, validation: true });
-                        } else {
-                            add_table_row({ title: "0-length intervals", value: data.zero_length_intervals.toLocaleString(), validation: true });
-                        }
-                        // < !--number of fields per line-- >
-                        add_table_row({ title: "BED fields", value: data.n_of_fields.join(",") });
-                        // < !--interval count-- >
-                        add_table_row({ title: "Total interval count", value: data.interval_count.toLocaleString() });
-                        // < !--total nucleotides-- >
-                        add_table_row({ title: "Total nucleotides", value: data.interval_length_total.toLocaleString() });
-                        // show the interval size dist
-                        add_plot_div("interval-size-dist", "Interval length distribution", 2).then(() => {
-                            var trace = {
-                                x: data.interval_lengths,
-                                type: "histogram",
-                                marker: { color: aesthetics.palette[0] },
-                            };
-                            let layout = {
-                                height: 225,
-                                font: aesthetics.labelfont,
-                                padding: { t: 0, r: 15 },
-                                margin: { t: 0, r: 15 },
-                                xaxis: { title: "Interval length", automargin: true },
-                                yaxis: { title: "Count", automargin: true },
-                                legend: { font: { size: 16 } },
-                            };
-                            Plotly.newPlot("interval-size-dist-plot", [trace], layout, plot_config);
-                        });
-
-                        let chr_intervals = [];
-                        for (const [chrom, lengths] of Object.entries(data.chr_interval_lengths)) {
-                            chr_intervals.push({
-                                chr: chrom,
-                                min: math.min(lengths),
-                                max: math.max(lengths),
-                                mean: math.mean(lengths).toFixed(2),
-                                median: math.median(lengths).toFixed(2),
-                                mode: math.mode(lengths)[0],
-                            });
-                        }
-                        build_table(chr_intervals);
-
-                        // sort by start, asc
-                        bed.sort((a, b) => (a[1] > b[1] ? 1 : a[1] < b[1] ? -1 : 0));
-                        // sort by chrom, asc
-                        bed.sort((a, b) => (a[0] > b[0] ? 1 : a[0] < b[0] ? -1 : 0));
-                        build_input_test();
-                        // convert bed to string
-                        let str = "";
-                        bed.map((a) => (str += a.join("\t") + "\n"));
-                        await CLI.fs.writeFile("a.bed", str);
-                        global_data.chromosomes.sort(sort_alphanum);
-                    }
-                },
-            });
+            if (url) {
+                process_remote_file({file:file_obj})
+            } else {
+                process_local_file({
+                    file: file_obj,
+                    download: event.type == "click" ? true : false,
+                })
+            }
         }
     };
 
@@ -1147,9 +1258,29 @@
     };
 
     $(document).ready(function () {
+        // local file
         document.getElementById("file-upload").addEventListener("change", file_upload);
+        // remote file
+        document.getElementById("url-upload").addEventListener("click", file_upload)
+        document.getElementById("url-input").addEventListener("keyup", (e) => {
+            if (e.key === 'Enter' || e.keyCode === 13) {
+                document.getElementById("url-upload").click();
+                e.stopPropagation();
+            }
+            e.stopPropagation();
+        })
+        // examples
         document.getElementById("load-example-cgpislands").addEventListener("click", file_upload);
         document.getElementById("load-example-truncatedexons").addEventListener("click", file_upload);
+        // swapping upload elements
+        document.getElementById("local-file-btn").addEventListener("click", () => {
+            $("#local-file-upload").prop("hidden", false)
+            $("#remote-file-upload").prop("hidden", true)
+        })
+        document.getElementById("remote-file-btn").addEventListener("click", () => {
+            $("#local-file-upload").prop("hidden", true)
+            $("#remote-file-upload").prop("hidden", false)
+        })
     });
 </script>
 
