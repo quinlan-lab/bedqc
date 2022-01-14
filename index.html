@@ -878,12 +878,12 @@
         );
 
         let cols = [
-            { data: "chr", title: "Chromosome" },
-            { data: "min", title: "Minimum" },
-            { data: "max", title: "Maximum" },
-            { data: "mean", title: "Mean" },
-            { data: "median", title: "Median" },
-            { data: "mode", title: "Mode" },
+            { data: "chr", title: "Chromosome", render: $.fn.dataTable.render.text() },
+            { data: "min", title: "Minimum", render: $.fn.dataTable.number },
+            { data: "max", title: "Maximum", render: $.fn.dataTable.number },
+            { data: "mean", title: "Mean", render: $.fn.dataTable.number },
+            { data: "median", title: "Median", render: $.fn.dataTable.number },
+            { data: "mode", title: "Mode", render: $.fn.dataTable.number },
         ];
 
         $("#chrom-stats-table").DataTable({
@@ -964,6 +964,7 @@
             skipEmptyLines: "greedy",
             header: false,
             delimitersToGuess: ["\t", ",", " ", "|", ";", Papa.RECORD_SEP, Papa.UNIT_SEP],
+            encoding: "utf-8",
             step: (res, parser) => {
                 data.interval_count += 1;
 
