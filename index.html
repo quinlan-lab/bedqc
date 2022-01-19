@@ -921,8 +921,6 @@
 
         let url = new URL(file)
 
-        // let t = await CLI.mount("https://raw.githubusercontent.com/hoffmangroup/acidbio/master/bed/BED03/good/01-known_scaffolds.bed")
-
         try {
             await CLI.mount(url.href)
         } catch (error) {
@@ -1044,7 +1042,6 @@
                 $("#example-loading").prop("hidden", true);
                 // resize the upload area
                 let el = document.getElementById("file-upload");
-                // $(".form-control-lg::file-selector-button").attr("style", "min-height:")
                 // show the file stats
                 $("#file-validation").prop("hidden", false);
                 if (!(data.delimiter == "\t")) {
